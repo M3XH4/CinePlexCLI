@@ -4,6 +4,7 @@ public class Seat {
 
     public Seat(String seatID) {
         setSeatID(seatID);
+        setAvailable(true);
     }
 
     public boolean isAvailable() {

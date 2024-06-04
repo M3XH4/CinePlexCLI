@@ -2,7 +2,7 @@ public class Movie {
     private String name;
     private String details;
 
-    public Movie(String details, String name) {
+    public Movie(String name, String details) {
         this.details = details;
         this.name = name;
     }
