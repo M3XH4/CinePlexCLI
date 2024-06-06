@@ -25,4 +25,13 @@ public class CinemaManager {
     public void setCinemas(ArrayList<Cinema> cinemas) {
         this.cinemas = cinemas;
     }
+
+    public Cinema findCinemaByMovieName(String movieName) {
+        for (Cinema cinema : cinemas) {
+            if (cinema.getMovie().getName().equals(movieName)) {
+                return cinema;
+            }
+        }
+        return null;
+    }
 }

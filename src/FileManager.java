@@ -3,7 +3,37 @@ import java.util.*;
 
 public class FileManager {
     private static final String cinemaFile = "src\\bin\\cinema.txt";
+    private static final String printerFile = "src\\bin\\printer.txt";
+    public static void createFile() throws IOException {
+        File cinemafile = new File(cinemaFile);
+        File printerfile = new File(printerFile);
+        if (!cinemafile.exists()) {
+            cinemafile.createNewFile();
+        }
+        if (!printerfile.exists()) {
+            printerfile.createNewFile();
+        }
+    }
+    public static void savePrinter(int printer) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(printerFile));
 
+        writer.write("Printer: " + printer);
+
+        writer.close();
+    }
+    public static int loadPrinter() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(printerFile));
+        String line;
+        int tempPrinter = 0;
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("Printer: ")) {
+                String printerCode = line.substring(9);
+                tempPrinter = Integer.parseInt(printerCode);
+            }
+        }
+
+        return tempPrinter;
+    }
     public static void saveBookings(ArrayList<Cinema> cinemas) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(cinemaFile));
 
@@ -14,6 +44,12 @@ public class FileManager {
                 writer.write("Movie: " + cinema.getMovie().getName());
             } else {
                 writer.write("Movie: None");
+            }
+            writer.newLine();
+            if (!cinema.getMovie().getDetails().isEmpty()) {
+                writer.write("Details: " + cinema.getMovie().getDetails());
+            } else {
+                writer.write("Details: None");
             }
             writer.newLine();
             for (Seat seat : cinema.getSeats()) {
@@ -30,6 +66,8 @@ public class FileManager {
         BufferedReader reader = new BufferedReader(new FileReader(cinemaFile));
         String line;
         Cinema currentCinema = null;
+        String name = "";
+        String details = "";
         while ((line = reader.readLine()) != null) {
             if (line.startsWith("Cinema: ")) {
                 String cinemaID = line.trim().substring(8);
@@ -39,7 +77,15 @@ public class FileManager {
                 if (line.startsWith("Movie: ")) {
                     String movieName = line.substring(7);
                     if (!movieName.equals("None")) {
-                        currentCinema.setMovie(new Movie(movieName, ""));
+                        name = movieName;
+                    }
+                } else if (line.startsWith("Details: ")) {
+                    String movieDetails = line.substring(9);
+                    details = movieDetails;
+                    if (!movieDetails.equals("None")) {
+                        currentCinema.setMovie(new Movie(name, details));
+                    } else {
+                        currentCinema.setMovie(new Movie(name, ""));
                     }
                 }
                 String[] seatDetails = line.split(":");

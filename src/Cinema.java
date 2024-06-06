@@ -6,14 +6,14 @@ public class Cinema {
     private ArrayList<Seat> seats;
 
     public Cinema(String id) {
-        this.id = id;
-        seats = new ArrayList<>();
+        setId(id);
+        setSeats(new ArrayList<>());
         putSeats();
     }
-    private void putSeats() {
-        String[] rows = {"D", "C", "B", "A"};
+    public void putSeats() {
+        String[] rows = {"G","F", "E", "D", "C", "B", "A"};
         for(String row: rows) {
-            for(int i = 1; i <= 10; i++) {
+            for(int i = 1; i <= 6; i++) {
                 seats.add(new Seat(row + i));
             }
         }
@@ -53,12 +53,59 @@ public class Cinema {
         }
         return false;
     }
+    public int totalBookedSeats() {
+        ArrayList<Seat> tempSeats = new ArrayList<>();
 
+        for (Seat seat : seats) {
+            if (!seat.isAvailable()) {
+                tempSeats.add(seat);
+            }
+        }
+        return tempSeats.size();
+    }
+    public int totalAvailableSeats() {
+        ArrayList<Seat> tempSeats = new ArrayList<>();
+
+        for (Seat seat : seats) {
+            if (seat.isAvailable()) {
+                tempSeats.add(seat);
+            }
+        }
+        return tempSeats.size();
+    }
     public void cancelSeat(String seatID) {
         for (Seat seat : seats) {
             if (seat.getSeatID().equals(seatID)) {
                 seat.cancel();
             }
         }
+    }
+    public static void displaySeats(ArrayList<Seat> seats) {
+        String[] rows = {"G", "F", "E", "D", "C", "B", "A"};
+        for (String row : rows) {
+            System.out.print(FontManager.BACKGROUND_BLACK + " " + FontManager.RESET);
+            for (int i = 1; i <= 3; i++) {
+                Seat seat = findSeat(seats, row + i);
+                if (seat != null) {
+                    System.out.print(FontManager.BACKGROUND_BLACK + "[ " + FontManager.BOLD + seat.getSeatID() + FontManager.RESET + FontManager.BACKGROUND_BLACK + ": " + (seat.isAvailable() ? FontManager.TEXT_GREEN_BRIGHT + "Available" : FontManager.TEXT_RED_BRIGHT + "Booked   ") + FontManager.RESET + FontManager.BACKGROUND_BLACK + " ] " + FontManager.RESET);
+                }
+            }
+            System.out.print(FontManager.BACKGROUND_BLACK + "   " + FontManager.RESET);
+            for (int i = 4; i <= 6; i++) {
+                Seat seat = findSeat(seats, row + i);
+                if (seat != null) {
+                    System.out.print(FontManager.BACKGROUND_BLACK + "[ " + FontManager.BOLD + seat.getSeatID() + FontManager.RESET + FontManager.BACKGROUND_BLACK + ": " + (seat.isAvailable() ? FontManager.TEXT_GREEN_BRIGHT + "Available" : FontManager.TEXT_RED_BRIGHT + "Booked   ") + FontManager.RESET + FontManager.BACKGROUND_BLACK + " ] " + FontManager.RESET);                }
+            }
+            System.out.println();
+        }
+    }
+
+    public static Seat findSeat(ArrayList<Seat> seats, String seatID) {
+        for (Seat seat : seats) {
+            if (seat.getSeatID().equals(seatID)) {
+                return seat;
+            }
+        }
+        return null;
     }
 }
