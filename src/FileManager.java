@@ -10,6 +10,12 @@ public class FileManager {
         for (Cinema cinema : cinemas) {
             writer.write("Cinema: " + cinema.getId());
             writer.newLine();
+            if (cinema.getMovie() != null) {
+                writer.write("Movie: " + cinema.getMovie().getName());
+            } else {
+                writer.write("Movie: None");
+            }
+            writer.newLine();
             for (Seat seat : cinema.getSeats()) {
                 writer.write(seat.getSeatID() + ":" + seat.isAvailable());
                 writer.newLine();
@@ -19,15 +25,23 @@ public class FileManager {
         writer.close();
     }
 
-    public static void loadBookings(ArrayList<Cinema> cinemas) throws IOException {
+    public static ArrayList<Cinema> loadBookings() throws IOException {
+        ArrayList<Cinema> cinemas = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(cinemaFile));
         String line;
         Cinema currentCinema = null;
         while ((line = reader.readLine()) != null) {
-            if (line.startsWith("Cinema:")) {
-                String cinemaID = line.substring(7);
-                currentCinema = findCinema(cinemas, cinemaID);
+            if (line.startsWith("Cinema: ")) {
+                String cinemaID = line.trim().substring(8);
+                currentCinema = new Cinema(cinemaID);
+                cinemas.add(currentCinema);
             } else if (currentCinema != null) {
+                if (line.startsWith("Movie: ")) {
+                    String movieName = line.substring(7);
+                    if (!movieName.equals("None")) {
+                        currentCinema.setMovie(new Movie(movieName, ""));
+                    }
+                }
                 String[] seatDetails = line.split(":");
                 String seatID = seatDetails[0];
                 boolean isAvailable = Boolean.parseBoolean(seatDetails[1]);
@@ -41,8 +55,8 @@ public class FileManager {
                     }
                 }
             }
-
         }
+        return cinemas;
     }
 
     private static Cinema findCinema(ArrayList<Cinema> cinemas, String id) {

@@ -1,10 +1,13 @@
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 public class MainClass {
     public static void main(String[] args) throws IOException {
         CinemaManager cinemaManager = new CinemaManager();
-        initializeCinemas(cinemaManager);
+        ArrayList<Cinema> loadCinema = FileManager.loadBookings();
+        cinemaManager.setCinemas(loadCinema);
+        System.out.println(cinemaManager.getCinema("1"));
         Scanner input = new Scanner(System.in);
         String horizontalLine = "=====================================================================";
         boolean showTitle = true;
