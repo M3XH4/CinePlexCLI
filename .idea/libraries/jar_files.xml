@@ -2,9 +2,11 @@
   <library name="jar_files">
     <CLASSES>
       <root url="file://$USER_HOME$/Downloads/jar_files" />
+      <root url="file://$PROJECT_DIR$/jar_files" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/jar_files" recursive="false" />
     <jarDirectory url="file://$USER_HOME$/Downloads/jar_files" recursive="false" />
   </library>
 </component>
