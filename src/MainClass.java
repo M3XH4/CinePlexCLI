@@ -208,6 +208,7 @@ public class MainClass {
                                 if (paymentAmount >= total) {
                                     double change = paymentAmount - total;
                                     System.out.println(FontManager.primaryCombo + String.format("Payment Accepted. Your Change Is %.2f PHP", change) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Payment Accepted. Your Change Is %.2f PHP", change).length()));
+                                    PrintManager.print(shoppingCart, quantities, total, paymentAmount, change);
                                     Thread.sleep(500);
                                     break;
                                 } else {

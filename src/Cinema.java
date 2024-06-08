@@ -10,10 +10,11 @@ public class Cinema {
         setSeats(new ArrayList<>());
         putSeats();
     }
+
     public void putSeats() {
         String[] rows = {"G","F", "E", "D", "C", "B", "A"};
-        for(String row: rows) {
-            for(int i = 1; i <= 6; i++) {
+        for(String row : rows) {
+            for (int i = 1; i <= 6; i++) {
                 seats.add(new Seat(row + i));
             }
         }
@@ -55,7 +56,6 @@ public class Cinema {
     }
     public int totalBookedSeats() {
         ArrayList<Seat> tempSeats = new ArrayList<>();
-
         for (Seat seat : seats) {
             if (!seat.isAvailable()) {
                 tempSeats.add(seat);
@@ -65,7 +65,6 @@ public class Cinema {
     }
     public int totalAvailableSeats() {
         ArrayList<Seat> tempSeats = new ArrayList<>();
-
         for (Seat seat : seats) {
             if (seat.isAvailable()) {
                 tempSeats.add(seat);
