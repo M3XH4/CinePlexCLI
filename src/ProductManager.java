@@ -52,7 +52,7 @@ public class ProductManager implements Serializable {
         Global.putHorizontalLine(FontManager.primaryCombo, MainClass.horizontalLineLength);
         for (Product product : products) {
             if (product instanceof Drinks drinks) {
-                System.out.println(FontManager.primaryCombo + "| " + Global.spacerString(57, drinks.getName()) + " | " + Global.spacerString(22, drinks.getSize().toString()) + " | " + Global.spacerString(23, (String.format("%.2f PHP", drinks.getSize().getPrice()))) + " |" + FontManager.RESET);
+                System.out.println(FontManager.primaryCombo + "| " + Global.spacerString(57, drinks.getName()) + " | " + Global.spacerString(22, drinks.getSize().toString()) + " | " + Global.spacerString(23, (String.format("%.2f PHP", drinks.getPrice()))) + " |" + FontManager.RESET);
             }
         }
         Global.putHorizontalLine(FontManager.primaryCombo, MainClass.horizontalLineLength);

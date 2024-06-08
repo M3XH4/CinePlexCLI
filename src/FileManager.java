@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,6 +24,7 @@ public class FileManager {
         }
         if (!printerfile.exists()) {
             printerfile.createNewFile();
+            savePrinter(0);
         }
         if (!productsfile.exists()) {
             productsfile.createNewFile();
@@ -120,7 +122,6 @@ public class FileManager {
     public static void saveProducts(ArrayList<Product> products) throws IOException {
         ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(productsFile));
         outputStream.writeObject(products);
-        System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "Successfully Saved Products" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - ("Successfully Saved Products").length() + 50));
     }
     public static ArrayList<Product> loadProducts(){
         ArrayList<Product> tempProducts = null;
@@ -128,8 +129,7 @@ public class FileManager {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(productsFile))) {
             tempProducts = (ArrayList<Product>) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println(FontManager.errorCombo + "ERROR! Cannot Load Products From File. Please Try Again" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - "ERROR! Cannot Load Products From File. Please Try Again".length()));
-            e.printStackTrace();;
+            return null;
         }
         return tempProducts;
     }

@@ -22,14 +22,15 @@ public class MainClass {
         } else {
             cinemaManager.setCinemas(loadCinema);
         }
+
         ProductManager productManager = new ProductManager();
         ArrayList<Product> loadProducts = FileManager.loadProducts();
-
-        if (loadProducts == null) {
-            initializeProducts(productManager);
-        } else {
+        if (loadProducts != null && !loadProducts.isEmpty()) {
             productManager.setProducts(loadProducts);
+        } else {
+            initializeProducts(productManager);
         }
+
         //Loading Printer Data
         PrintManager.printer = FileManager.loadPrinter();
 
@@ -132,10 +133,95 @@ public class MainClass {
                     }
                 } while (true);
             } else if (choice.equals("BUY")) {
+                ArrayList<Product> shoppingCart = new ArrayList<>();
+                ArrayList<Integer> quantities = new ArrayList<>();
+                double total = 0;
+
                 do {
                     productManager.displaySnacks();
                     productManager.displayDrinks();
+                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                    System.out.print(FontManager.responseCombo + "Type In The Name Of The Product To Purchase It or Type in Back To Go Back To Main Page: " + FontManager.RESET);
+                    String purchaseChoice = input.nextLine();
+                    if (purchaseChoice.equalsIgnoreCase("Back")) {
+                        break;
+                    }
+
+                    Product selectedProduct = null;
+                    Drinks.Size selectedSize = null;
+                    for (Product product : productManager.getProducts()) {
+                        if (product instanceof Drinks drinks) {
+                            for (Drinks.Size size : Drinks.Size.values()) {
+                                if (drinks.getName().equalsIgnoreCase(purchaseChoice) && selectedProduct == null) {
+                                    selectedProduct = drinks;
+                                    selectedSize = size;
+                                }
+                            }
+                        } else if (product.getName().equalsIgnoreCase(purchaseChoice)) {
+                            selectedProduct = product;
+                        }
+                    }
+
+                    if (selectedProduct == null) {
+                        System.out.println(FontManager.warningCombo + "WARNING! Please Type In The Right Product Name. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Type In The Right Product Name. Please Try Again.".length()));
+                        continue;
+                    }
+                    if (selectedProduct instanceof Drinks) {
+                        do {
+                            try {
+                                System.out.print(FontManager.responseCombo + "Select The Size of " + selectedProduct.getName() + " (SMALL,MEDIUM,LARGE): " + FontManager.RESET);
+                                selectedSize = Drinks.Size.valueOf(input.nextLine().toUpperCase());
+                                break;
+                            } catch (IllegalArgumentException e) {
+                                System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Correct Size. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Correct Size. Please Try Again.".length()));
+                            }
+                        } while (true);
+                    }
+                    System.out.print(FontManager.responseCombo + "How Many " + selectedProduct.getName() + " Are You Purchasing: " + FontManager.RESET);
+                    int quantity = input.nextInt();
+                    input.nextLine();
+
+                    if (selectedProduct instanceof Drinks drinks) {
+                        total += drinks.getPriceForSize(selectedSize) * quantity;
+                    } else {
+                        total += selectedProduct.getPrice() * quantity;
+                    }
+                    shoppingCart.add(selectedProduct);
+                    quantities.add(quantity);
+                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                    System.out.println(FontManager.primaryCombo + String.format("Total Cost: %.2f PHP", total) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Total Cost: %.2f PHP", total).length()));
+                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                    System.out.print(FontManager.responseCombo + "Do You Want To Add Another Product (Yes/No): " + FontManager.RESET);
+                    String addChoice = input.nextLine().toUpperCase();
+                    if (addChoice.equals("YES")) {
+                        continue;
+                    } else if (addChoice.equals("NO")) {
+                        do {
+                            System.out.print(FontManager.responseCombo + "Enter The Amount To Pay Or Type 'Cancel' To Cancel The Purchase: " + FontManager.RESET);
+                            String payment = input.nextLine();
+                            if (payment.equalsIgnoreCase("Cancel")) {
+                                System.out.println(FontManager.warningCombo + Global.putSpaces(45) + "Purchase Cancelled." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Purchase Cancelled.").length() + 45));
+                                break;
+                            }
+                            try {
+                                double paymentAmount = Double.parseDouble(payment);
+                                if (paymentAmount >= total) {
+                                    double change = paymentAmount - total;
+                                    System.out.println(FontManager.primaryCombo + String.format("Payment Accepted. Your Change Is %.2f PHP", change) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Payment Accepted. Your Change Is %.2f PHP", change).length()));
+                                    Thread.sleep(500);
+                                    break;
+                                } else {
+                                    System.out.println(FontManager.warningCombo + "WARNING! Insufficient Amount. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Insufficient Amount. Please Try Again.".length()));
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount Or Text." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount Or Text.".length()));
+                            }
+                        } while (true);
+                    } else {
+                        System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Right Choices. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Right Choices. Please Try Again.".length()));
+                    }
                 } while (true);
+
             } else if (choice.equals("LOGIN")) {
                 String username = "";
                 String password = "";
@@ -284,7 +370,18 @@ public class MainClass {
 
                             } while (admin_EditCRunning);
                         } else if (managerChoice.equals("SNACKS")) {
-
+                            do {
+                                productManager.displaySnacks();
+                                productManager.displayDrinks();
+                                Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLine.length()));
+                                System.out.println(FontManager.primaryCombo + "    ADD" + FontManager.secondaryCombo + ":    To Add Products" + Global.putSpaces(57) + FontManager.primaryCombo + "EDIT" + FontManager.TEXT_WHITE_BRIGHT + ": Edit Products" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, 9));
+                                System.out.println(FontManager.primaryCombo + "    DELETE" + FontManager.secondaryCombo + ": To Delete Products" + Global.putSpaces(54) + FontManager.primaryCombo + "BACK" + FontManager.TEXT_WHITE_BRIGHT + ": Back To Admin Page" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, 4));
+                                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLine.length()));
+                                Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                System.out.print(FontManager.responseCombo + "Choose Which Option Would You Like To Do: " + FontManager.RESET);
+                                String snacksChoice = input.nextLine();
+                            } while (true);
                         } else if (managerChoice.equals("PRINTER")) {
                             do {
                                 Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
@@ -352,9 +449,13 @@ public class MainClass {
         cinemaManager.getCinema("4").setMovie(MovieAPI.fetchMovie("Saw X"));
     }
     //Function For Initializing Products
-    private static void initializeProducts(ProductManager productManager) {
-        productManager.addProduct(new Snack("Lay's Original Chip", 14.00));
-        productManager.addProduct(new Snack("Cookies", 18.00));
+    private static void initializeProducts(ProductManager productManager) throws IOException {
+        productManager.addProduct(new Snack("Popcorn", 45.00));
+        productManager.addProduct(new Snack("Fries", 35.00));
+        productManager.addProduct(new Drinks("Coke", 20.00, Drinks.Size.SMALL));
+        productManager.addProduct(new Drinks("Coke", 30.00, Drinks.Size.MEDIUM));
+        productManager.addProduct(new Drinks("Coke", 35.00, Drinks.Size.LARGE));
+        FileManager.saveProducts(productManager.getProducts());
     }
     //Function For Wrapping Text
     private static ArrayList<String> wrapText(String text, int lineLength) {

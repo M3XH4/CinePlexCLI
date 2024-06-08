@@ -42,32 +42,36 @@ class Drinks extends Product implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     public enum Size {
-        SMALL(15.00),
-        MEDIUM(25.00),
-        LARGE(30.00);
+        SMALL,
+        MEDIUM,
+        LARGE;
 
-        private double price;
-
-        Size(double price) {
-            setPrice(price);
-        }
+        private double price;  // Each size has a price.
 
         public double getPrice() {
-            return price;
+            return this.price;
         }
 
         public void setPrice(double price) {
             this.price = price;
         }
     }
-    private double[] prices = new double[Size.values().length];
     private Size size;
 
-    public Drinks(String name, Size size) {
-        super(name, size.getPrice());
+    public Drinks(String name, double price, Size size) {
+        super(name, price);
         setSize(size);
+        getSize().setPrice(price);
+    }
+    // Get the price for a specific size
+    public double getPriceForSize(Size size) {
+        return size.getPrice();
     }
 
+    // Set the price for a specific size
+    public void setPriceForSize(Size size, double price) {
+        size.setPrice(price);
+    }
     public Size getSize() {
         return size;
     }
