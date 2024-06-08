@@ -1,17 +1,31 @@
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class FileManager {
-    private static final String cinemaFile = "src\\bin\\cinema.txt";
-    private static final String printerFile = "src\\bin\\printer.txt";
+    private static final String cinemaFile = getSourcePath() + "\\bin\\cinema.txt";
+    private static final String printerFile = getSourcePath() + "\\bin\\printer.txt";
+    private static final String productsFile = getSourcePath() + "\\bin\\products.dat";
+
+    private static String getSourcePath() {
+        Path currentPath = Paths.get("");
+        return currentPath.toAbsolutePath() + "\\src";
+    }
+
     public static void createFile() throws IOException {
         File cinemafile = new File(cinemaFile);
         File printerfile = new File(printerFile);
+        File productsfile = new File(productsFile);
+
         if (!cinemafile.exists()) {
             cinemafile.createNewFile();
         }
         if (!printerfile.exists()) {
             printerfile.createNewFile();
+        }
+        if (!productsfile.exists()) {
+            productsfile.createNewFile();
         }
     }
     public static void savePrinter(int printer) throws IOException {
@@ -60,14 +74,13 @@ public class FileManager {
 
         writer.close();
     }
-
     public static ArrayList<Cinema> loadBookings() throws IOException {
         ArrayList<Cinema> cinemas = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(cinemaFile));
         String line;
         Cinema currentCinema = null;
         String name = "";
-        String details = "";
+        String details;
         while ((line = reader.readLine()) != null) {
             if (line.startsWith("Cinema: ")) {
                 String cinemaID = line.trim().substring(8);
@@ -104,13 +117,20 @@ public class FileManager {
         }
         return cinemas;
     }
+    public static void saveProducts(ArrayList<Product> products) throws IOException {
+        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(productsFile));
+        outputStream.writeObject(products);
+        System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "Successfully Saved Products" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - ("Successfully Saved Products").length() + 50));
+    }
+    public static ArrayList<Product> loadProducts(){
+        ArrayList<Product> tempProducts = null;
 
-    private static Cinema findCinema(ArrayList<Cinema> cinemas, String id) {
-        for (Cinema cinema : cinemas) {
-            if (cinema.getId().equals(id)) {
-                return cinema;
-            }
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(productsFile))) {
+            tempProducts = (ArrayList<Product>) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(FontManager.errorCombo + "ERROR! Cannot Load Products From File. Please Try Again" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - "ERROR! Cannot Load Products From File. Please Try Again".length()));
+            e.printStackTrace();;
         }
-        return null;
+        return tempProducts;
     }
 }

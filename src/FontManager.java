@@ -52,4 +52,12 @@ public class FontManager {
     public static final String ENCIRCLED = "\u001B[52m";
     public static final String OVERLINE = "\u001B[53m";
     public static final String ERASE_ENTIRE_SCREEN = "\u001B[2J";
+
+    //COMBO PALETTE
+    public static final String primaryCombo = "\u001B[40;97;1m";
+    public static final String secondaryCombo = "\u001B[40;97m";
+    public static final String tertiaryCombo = "\u001B[41;30m";
+    public static final String responseCombo = "\u001B[97;1m";
+    public static final String warningCombo = "\u001B[40;93;1m";
+    public static final String errorCombo = "\u001B[40;91;1m";
 }

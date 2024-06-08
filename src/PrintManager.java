@@ -1,18 +1,14 @@
-import javax.imageio.ImageIO;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import java.awt.image.BufferedImage;
 import java.awt.print.Paper;
 import java.awt.*;
 import java.awt.print.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PrintManager {
     public static int printer = 5;
     public static PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-    private static final String horizontalLine = "================================================================================================================";
 
     private static final double inch = 72;
     private static final double width = 3 * inch;
@@ -20,11 +16,11 @@ public class PrintManager {
 
     public static void displayPrinters() {
         for (int i = 0; i < printServices.length; i++) {
-            System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + FontManager.BOLD + "     " + (i + 1) + ". " + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + printServices[i].getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLine.length() - ("     " + (i + 1) + ". " + printServices[i].getName()).length()));
+            System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + FontManager.BOLD + "     " + (i + 1) + ". " + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + printServices[i].getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - ("     " + (i + 1) + ". " + printServices[i].getName()).length()));
         }
     }
     public static void displayCurrentPrinter() {
-        System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "    Current Printer: " + FontManager.BOLD + printServices[printer].getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLine.length() - ("Current Printer: " + FontManager.BOLD + printServices[printer].getName()).length()));
+        System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "    Current Printer: " + FontManager.BOLD + printServices[printer].getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - ("Current Printer: " + FontManager.BOLD + printServices[printer].getName()).length()));
     }
     public static void print(String movie, String cinemaCode, String seat) {
         PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
@@ -77,5 +73,45 @@ public class PrintManager {
         } catch (PrinterException e) {
             System.out.println("Error Printing: " + e.getMessage());
         }
+    }
+}
+
+class ReceiptTemplate {
+    public static void receiptSeats(Graphics2D g2D, String movie, String cinemaCode, String seat) {
+        String purchaseDate = getCurrentDateTime();
+        int inch = 72;
+        int width = 3 * inch;
+
+        int centerX = width / 2;
+        int y = 20;
+
+        g2D.setFont(new Font("Bebas Neue", Font.PLAIN, 16));
+        g2D.drawString("CINEPLEX", centerX - g2D.getFontMetrics().stringWidth("CINEPLEX") / 2, y);
+        y += g2D.getFontMetrics().getHeight();
+        g2D.setFont(new Font("Bebas Neue", Font.PLAIN, 9));
+        g2D.drawString("Purchase Date: " + purchaseDate, centerX - g2D.getFontMetrics().stringWidth("Purchase Date: " + purchaseDate) / 2, y);
+        y += g2D.getFontMetrics().getHeight();
+        g2D.setFont(new Font("Bebas Neue", Font.PLAIN, 14));
+        g2D.drawString(seat, centerX - g2D.getFontMetrics().stringWidth(seat) / 2, y);
+        y += g2D.getFontMetrics().getHeight();
+        g2D.setFont(new Font("Bebas Neue", Font.PLAIN, 11));
+        g2D.drawString("Cinema " + cinemaCode, centerX - g2D.getFontMetrics().stringWidth("Cinema " + cinemaCode) / 2, y);
+
+        y += 20;
+        g2D.setFont(g2D.getFont().deriveFont(Font.BOLD));
+        g2D.drawString(movie, centerX - g2D.getFontMetrics().stringWidth(movie) / 2, y);
+        g2D.setFont(new Font("Bebas Neue", Font.PLAIN, 9));
+        y += 2 * g2D.getFontMetrics().getHeight();
+        g2D.setFont(g2D.getFont().deriveFont(Font.ITALIC));
+        g2D.drawString( "THANK YOU AND WE HOPE YOU HAVE A GREAT TIME!", centerX - g2D.getFontMetrics().stringWidth( "THANK YOU AND WE HOPE YOU HAVE A GREAT TIME!") / 2, y);
+
+    }
+    public static void receiptShop(Graphics2D g2D) {
+
+    }
+
+    private static String getCurrentDateTime() {
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+        return formatter.format(new Date());
     }
 }

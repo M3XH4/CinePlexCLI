@@ -83,19 +83,25 @@ public class Cinema {
     public static void displaySeats(ArrayList<Seat> seats) {
         String[] rows = {"G", "F", "E", "D", "C", "B", "A"};
         for (String row : rows) {
-            System.out.print(FontManager.BACKGROUND_BLACK + " " + FontManager.RESET);
+            System.out.print(FontManager.primaryCombo + "|" + FontManager.RESET);
             for (int i = 1; i <= 3; i++) {
                 Seat seat = findSeat(seats, row + i);
                 if (seat != null) {
-                    System.out.print(FontManager.BACKGROUND_BLACK + "[ " + FontManager.BOLD + seat.getSeatID() + FontManager.RESET + FontManager.BACKGROUND_BLACK + ": " + (seat.isAvailable() ? FontManager.TEXT_GREEN_BRIGHT + "Available" : FontManager.TEXT_RED_BRIGHT + "Booked   ") + FontManager.RESET + FontManager.BACKGROUND_BLACK + " ] " + FontManager.RESET);
+                    System.out.print(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "[ " + FontManager.BOLD + seat.getSeatID() + FontManager.RESET + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + ": " + (seat.isAvailable() ? FontManager.TEXT_GREEN_BRIGHT + "Available" : FontManager.TEXT_RED_BRIGHT + "Booked   ") + FontManager.RESET + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + " ] " + FontManager.RESET);
                 }
             }
             System.out.print(FontManager.BACKGROUND_BLACK + "   " + FontManager.RESET);
             for (int i = 4; i <= 6; i++) {
                 Seat seat = findSeat(seats, row + i);
                 if (seat != null) {
-                    System.out.print(FontManager.BACKGROUND_BLACK + "[ " + FontManager.BOLD + seat.getSeatID() + FontManager.RESET + FontManager.BACKGROUND_BLACK + ": " + (seat.isAvailable() ? FontManager.TEXT_GREEN_BRIGHT + "Available" : FontManager.TEXT_RED_BRIGHT + "Booked   ") + FontManager.RESET + FontManager.BACKGROUND_BLACK + " ] " + FontManager.RESET);                }
+                    if (i <= 5) {
+                        System.out.print(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "[ " + FontManager.BOLD + seat.getSeatID() + FontManager.RESET + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + ": " + (seat.isAvailable() ? FontManager.TEXT_GREEN_BRIGHT + "Available" : FontManager.TEXT_RED_BRIGHT + "Booked   ") + FontManager.RESET + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + " ] " + FontManager.RESET);
+                    } else {
+                        System.out.print(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "[ " + FontManager.BOLD + seat.getSeatID() + FontManager.RESET + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + ": " + (seat.isAvailable() ? FontManager.TEXT_GREEN_BRIGHT + "Available" : FontManager.TEXT_RED_BRIGHT + "Booked   ") + FontManager.RESET + FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + " ]" + FontManager.RESET);
+                    }
+                }
             }
+            System.out.print(FontManager.primaryCombo + "|" + FontManager.RESET);
             System.out.println();
         }
     }
