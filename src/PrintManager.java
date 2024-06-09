@@ -23,6 +23,7 @@ public class PrintManager {
     public static void displayCurrentPrinter() {
         System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "    Current Printer: " + FontManager.BOLD + printServices[printer].getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - ("Current Printer: " + FontManager.BOLD + printServices[printer].getName()).length()));
     }
+
     public static void print(String movie, String cinemaCode, String seat) {
         PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 

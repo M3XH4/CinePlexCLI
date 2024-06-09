@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 public class MainClass {
@@ -68,14 +67,7 @@ public class MainClass {
                 do {
                     showCinemas = true;
                     if (showCinemas) {
-                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                        System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "CINEMAS" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("CINEMAS".length() + 50)));
-                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                        System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                        System.out.println(FontManager.secondaryCombo + "        " + Global.spacerString(51, ("Cinema " + FontManager.primaryCombo + "1: " + (!cinemaManager.getCinema("1").getMovie().getName().isEmpty() ? cinemaManager.getCinema("1").getMovie().getName() : "None"))) + FontManager.RESET + FontManager.secondaryCombo + "               " + Global.spacerString(50, ("Cinema " + FontManager.primaryCombo + "2: " + (!cinemaManager.getCinema("2").getMovie().getName().isEmpty() ? cinemaManager.getCinema("2").getMovie().getName() : "None"))) + "        " + FontManager.RESET);
-                        System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                        System.out.println(FontManager.secondaryCombo + "        " + Global.spacerString(51, ("Cinema " + FontManager.primaryCombo + "3: " + (!cinemaManager.getCinema("3").getMovie().getName().isEmpty() ? cinemaManager.getCinema("3").getMovie().getName() : "None"))) + FontManager.RESET + FontManager.secondaryCombo + "               " + Global.spacerString(50, ("Cinema " + FontManager.primaryCombo + "4: " + (!cinemaManager.getCinema("4").getMovie().getName().isEmpty() ? cinemaManager.getCinema("4").getMovie().getName() : "None"))) + "        " + FontManager.RESET);
-                        System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
+                        displayCinemas(cinemaManager);
                     }
                     showCinemas = false;
                     Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
@@ -88,13 +80,11 @@ public class MainClass {
                     if (selectedCinema == null) {
                         System.out.println(FontManager.errorCombo + Global.putSpaces(36) + "ERROR! Could Not Find Cinema" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("ERROR! Could Not Find Cinema".length() + 36)));
                     } else {
-
                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                         System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
                         System.out.println(FontManager.primaryCombo + Global.putSpaces(44) + "Cinema " + selectedCinema.getId() + " Is Selected" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("Cinema Is " + selectedCinema.getId() + " Selected").length() + 44)));
                         System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
                         System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "         Movie:     " + FontManager.BOLD + selectedCinema.getMovie().getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("         Movie:     " + selectedCinema.getMovie().getName()).length()));
-
                         int lineLength = horizontalLineLength - 28;
                         ArrayList<String> wrappedDetails = wrapText(selectedCinema.getMovie().getDetails(), lineLength);
                         System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "         Synopsis:  " + FontManager.BOLD + wrappedDetails.getFirst() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("         Synopsis:  " + wrappedDetails.getFirst()).length()));
@@ -106,29 +96,14 @@ public class MainClass {
 
                         do {
                             printDisplaySeats(selectedCinema);
-                            System.out.print(FontManager.TEXT_WHITE_BRIGHT + "Type In Seat Number To Book Seat or Type In Back To Go Back Selecting Cinema: " + FontManager.RESET);
+                            System.out.println(FontManager.primaryCombo + "Each Seat Is Priced At 250.00 PHP." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Each Seat Is Priced At 250.00 PHP.").length()));
+                            Global.putHorizontalLine(FontManager.primaryCombo, horizontalLineLength);
+                            System.out.print(FontManager.responseCombo + "Type In Seat Number To Book Seat or Type In Back To Go Back Selecting Cinema: " + FontManager.RESET);
                             String seatNumber = input.nextLine();
                             if (seatNumber.equalsIgnoreCase("Back")) {
                                 break;
                             }
-                            Seat seat = Cinema.findSeat(selectedCinema.getSeats(), seatNumber);
-                            if (seat != null) {
-                                if (seat.isAvailable()) {
-                                    PrintManager.print(selectedCinema.getMovie().getName(), selectedCinema.getId(), seat.getSeatID());
-                                    Thread.sleep(300);
-
-                                    seat.book();
-                                    FileManager.saveBookings(cinemaManager.getCinemas());
-                                    System.out.println(FontManager.primaryCombo + Global.putSpaces(42) + "Successfully Booked Seat " + seat.getSeatID() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("Successfully Booked Seat " + seat.getSeatID()).length() + 42)));
-                                    Thread.sleep(300);
-                                } else {
-                                    System.out.println(FontManager.errorCombo + Global.putSpaces(20) + "I'm Sorry But The Seat " + seat.getSeatID() + " Is Currently Booked. Please Pick Another Seat. " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("I'm Sorry But The Seat " + seat.getSeatID() + " Is Currently Booked. Please Pick Another Seat. " ).length() + 20)));
-                                    Thread.sleep(300);
-                                }
-                            } else {
-                                System.out.println(FontManager.warningCombo + Global.putSpaces(25) + "WARNING! Please Input The Right Seat Number. PLease Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Input The Right Seat Number. PLease Try Again...".length() + 25)));
-                                Thread.sleep(300);
-                            }
+                            handleSeatReservation(cinemaManager, selectedCinema, seatNumber, "BOOK");
                         } while (true);
                     }
                 } while (true);
@@ -137,8 +112,6 @@ public class MainClass {
                 ArrayList<Integer> quantities = new ArrayList<>();
                 double total = 0;
                 int loopRun = 0;
-                String addChoice = "";
-                boolean checkout = false;
                 do {
                     productManager.displaySnacks();
                     productManager.displayDrinks();
@@ -146,89 +119,49 @@ public class MainClass {
                     System.out.print(FontManager.responseCombo + "Type In The Name Of The Product To Purchase It or Type in Back To Go Back To Main Page: " + FontManager.RESET);
                     if (loopRun == 1) {
                         System.out.print(FontManager.responseCombo + "\nOr Type In Checkout To Purchase Products: " + FontManager.RESET);
-                        checkout = true;
                     }
                     String purchaseChoice = input.nextLine();
                     if (purchaseChoice.equalsIgnoreCase("Back")) {
                         break;
-                    } else if (!purchaseChoice.equalsIgnoreCase("Checkout")) {
-
-                        Product selectedProduct = null;
-                        Drinks.Size selectedSize = null;
-                        for (Product product : productManager.getProducts()) {
-                            if (product instanceof Drinks drinks) {
-                                for (Drinks.Size size : Drinks.Size.values()) {
-                                    if (drinks.getName().equalsIgnoreCase(purchaseChoice) && selectedProduct == null) {
-                                        selectedProduct = drinks;
-                                        selectedSize = size;
-                                    }
-                                }
-                            } else if (product.getName().equalsIgnoreCase(purchaseChoice)) {
-                                selectedProduct = product;
-                            }
-                        }
-
+                    } else if (purchaseChoice.equalsIgnoreCase("Checkout")) {
+                        handlePayment(total);
+                        continue;
+                    } else {
+                        Product selectedProduct = productManager.findProduct(purchaseChoice);
                         if (selectedProduct == null) {
                             System.out.println(FontManager.warningCombo + "WARNING! Please Type In The Right Product Name. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Type In The Right Product Name. Please Try Again.".length()));
                             continue;
                         }
-                        if (selectedProduct instanceof Drinks) {
-                            do {
-                                try {
-                                    System.out.print(FontManager.responseCombo + "Select The Size of " + selectedProduct.getName() + " (SMALL,MEDIUM,LARGE): " + FontManager.RESET);
-                                    selectedSize = Drinks.Size.valueOf(input.nextLine().toUpperCase());
-                                    break;
-                                } catch (IllegalArgumentException e) {
-                                    System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Correct Size. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Correct Size. Please Try Again.".length()));
-                                }
-                            } while (true);
-                        }
-                        
-                        System.out.print(FontManager.responseCombo + "How Many " + selectedProduct.getName() + " Are You Purchasing: " + FontManager.RESET);
-                        int quantity = input.nextInt();
-                        input.nextLine();
+                        Drinks.Size selectedSize = productManager.getDrinksSize(selectedProduct);
+                        int quantity = getQuantity(selectedProduct);
 
-                        if (selectedProduct instanceof Drinks drinks) {
+                        if (selectedProduct instanceof Drinks) {
                             total += ((Drinks) selectedProduct).getPriceForSize(selectedSize) * quantity;
                         } else {
                             total += selectedProduct.getPrice() * quantity;
                         }
+
                         shoppingCart.add(selectedProduct);
                         quantities.add(quantity);
+
                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                         System.out.println(FontManager.primaryCombo + String.format("Total Cost: %.2f PHP", total) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Total Cost: %.2f PHP", total).length()));
                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                         System.out.print(FontManager.responseCombo + "Do You Want To Add Another Product (Yes/No): " + FontManager.RESET);
-                        addChoice = input.nextLine().toUpperCase();
-                        loopRun++;
-                    }
-                    if (addChoice.equals("YES")) {
-                        continue;
-                    } else if (addChoice.equals("NO") || purchaseChoice.equalsIgnoreCase("Checkout")) {
+                        String addChoice = input.nextLine().toUpperCase();
                         do {
-                            System.out.print(FontManager.responseCombo + "Enter The Amount To Pay Or Type 'Cancel' To Cancel The Purchase: " + FontManager.RESET);
-                            String payment = input.nextLine();
-                            if (payment.equalsIgnoreCase("Cancel")) {
-                                System.out.println(FontManager.warningCombo + Global.putSpaces(45) + "Purchase Cancelled." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Purchase Cancelled.").length() + 45));
+                            if (addChoice.equals("YES")) {
+                                loopRun++;
                                 break;
                             }
-                            try {
-                                double paymentAmount = Double.parseDouble(payment);
-                                if (paymentAmount >= total) {
-                                    double change = paymentAmount - total;
-                                    System.out.println(FontManager.primaryCombo + String.format("Payment Accepted. Your Change Is %.2f PHP", change) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Payment Accepted. Your Change Is %.2f PHP", change).length()));
-                                    PrintManager.print(shoppingCart, quantities, total, paymentAmount, change);
-                                    Thread.sleep(500);
+                            if (addChoice.equals("NO")) {
+                                if (!handlePayment(total)) {
                                     break;
-                                } else {
-                                    System.out.println(FontManager.warningCombo + "WARNING! Insufficient Amount. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Insufficient Amount. Please Try Again.".length()));
                                 }
-                            } catch (NumberFormatException e) {
-                                System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount Or Text." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount Or Text.".length()));
+                            } else {
+                                System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Right Choices. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Right Choices. Please Try Again.".length()));
                             }
                         } while (true);
-                    } else {
-                        System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Right Choices. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Right Choices. Please Try Again.".length()));
                     }
                 } while (true);
             } else if (choice.equals("LOGIN")) {
@@ -275,10 +208,10 @@ public class MainClass {
                             do {
                                 Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                                 try {
-                                    System.out.print(FontManager.secondaryCombo + "Enter Cinema Number (1/2/3/4):" + FontManager.RESET + "  ");
+                                    displayCinemas(cinemaManager);
+                                    System.out.print(FontManager.secondaryCombo + "Type In Cinema Number (1/2/3/4):" + FontManager.RESET + "  ");
                                     String cinemaID = input.nextLine();
                                     Cinema cinema = cinemaManager.getCinema(cinemaID);
-
                                     do {
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                                         System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
@@ -305,28 +238,7 @@ public class MainClass {
                                                 }
                                                 Seat seat = Cinema.findSeat(cinema.getSeats(), cancelChoice);
                                                 if (seat != null) {
-                                                    if (!seat.isAvailable()) {
-                                                        System.out.println(FontManager.warningCombo + "    WARNING! This Will Cancel The Booking of Seat " + seat.getSeatID() + "." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("    WARNING! This Will Cancel The Booking of Seat " + seat.getSeatID() + ".").length()));
-                                                        System.out.println(FontManager.primaryCombo + "    Would You Like To Continue (Yes/No): " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("    Would You Like To Continue (Yes/No): ").length()));
-                                                        do {
-                                                            Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                                                            System.out.print(FontManager.responseCombo + "Your Response - " + FontManager.RESET);
-                                                            String warningChoice = input.nextLine().toUpperCase();
-                                                            if (warningChoice.isBlank()) {
-                                                                System.out.println(FontManager.warningCombo + "    WARNING! Please Don't Input Blank Texts. Please Try Again. " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "    WARNING! Don't Input Blank Texts ".length()));
-                                                            } else if (warningChoice.equals("YES")) {
-                                                                cinema.cancelSeat(seat.getSeatID());
-                                                                FileManager.saveBookings(cinemaManager.getCinemas());
-                                                                Thread.sleep(300);
-                                                                System.out.println(FontManager.primaryCombo + "Successfully Cancelled The Booking of Seat " + seat.getSeatID() + "." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Successfully Cancelled The Booking of Seat " + seat.getSeatID() + "." ).length()));
-                                                                break;
-                                                            } else if (warningChoice.equals("NO")) {
-                                                                break;
-                                                            }
-                                                        } while (true);
-                                                    } else {
-                                                        System.out.println(FontManager.warningCombo + "WARNING! Seat Is Still Available, Cannot Cancel Booking. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Seat Is Still Available, Cannot Cancel Booking. Please Try Again.".length()));
-                                                    }
+
                                                 } else {
                                                     System.out.println(FontManager.warningCombo + Global.putSpaces(25) + "WARNING! Please Input The Right Seat Number. PLease Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Input The Right Seat Number. PLease Try Again...".length() + 25)));
                                                     Thread.sleep(300);
@@ -411,7 +323,6 @@ public class MainClass {
                                 }
                                 try {
                                     int printerCode = (Integer.parseInt(printerChoice)) -1;
-
                                     if (printerCode >= 0 && printerCode < PrintManager.printServices.length) {
                                         PrintManager.printer = printerCode;
                                         FileManager.savePrinter(printerCode);
@@ -435,6 +346,109 @@ public class MainClass {
                 break;
             }
         } while (true);
+    }
+
+    //FUNCTIONS
+    private static int getQuantity(Product product) {
+        Scanner input = new Scanner(System.in);
+        int quantity;
+        do {
+            System.out.print(FontManager.responseCombo + "How Many " + product.getName() + " Are You Purchasing: " + FontManager.RESET);
+            try {
+                quantity = input.nextInt();
+                input.nextLine();
+                if (!(quantity > 0)) {
+                    System.out.println(FontManager.warningCombo + Global.putSpaces(25) + "WARNING! Please Input A Positive Integer. PLease Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Input A Positive Integer. PLease Try Again...".length() + 25)));
+                } else {
+                    return quantity;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println(FontManager.warningCombo + Global.putSpaces(25) + "WARNING! Please Input A Valid Integer. PLease Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Input A Valid Integer. PLease Try Again...".length() + 25)));
+                input.nextLine();
+            }
+        } while (true);
+    }
+    private static boolean handlePayment(double total) {
+        do {
+            Scanner input = new Scanner(System.in);
+            System.out.print(FontManager.responseCombo + "Enter The Amount To Pay Or Type 'Cancel' To Cancel The Purchase: " + FontManager.RESET);
+            String payment = input.nextLine();
+            if (payment.equalsIgnoreCase("Cancel")) {
+                Global.putHorizontalLine(FontManager.primaryCombo, horizontalLineLength);
+                System.out.println(FontManager.warningCombo + Global.putSpaces(45) + "Purchase Cancelled." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("Purchase Cancelled.").length() + 45)));
+                return false;
+            }
+            try {
+                double paymentAmount = Double.parseDouble(payment);
+                if (paymentAmount >= total) {
+                    double change = paymentAmount - total;
+                    System.out.println(FontManager.primaryCombo + String.format("Payment Accepted. Your Change Is %.2f PHP", change) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Payment Accepted. Your Change Is %.2f PHP", change).length()));
+                    return true;
+                } else {
+                    System.out.println(FontManager.warningCombo + "WARNING! Insufficient Amount. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Insufficient Amount. Please Try Again.".length()));
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount Or Text." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount Or Text.".length()));
+            }
+        } while (true);
+    }
+    private static void handleSeatReservation(CinemaManager cinemaManager, Cinema cinema, String seatNumber, String reservation) throws InterruptedException, IOException {
+        Seat seat = Cinema.findSeat(cinema.getSeats(), seatNumber);
+        if (seat != null) {
+            if (reservation.equals("BOOK")) {
+                if (seat.isAvailable()) {
+                    if (handlePayment(250.00)) {
+                        cinema.bookSeat(cinemaManager, seatNumber);
+                        Thread.sleep(300);
+                        PrintManager.print(cinema.getMovie().getName(), cinema.getId(), seat.getSeatID());
+                    }
+                } else {
+                    System.out.println(FontManager.errorCombo + Global.putSpaces(20) + "I'm Sorry But The Seat " + seat.getSeatID() + " Is Currently Booked. Please Pick Another Seat. " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("I'm Sorry But The Seat " + seat.getSeatID() + " Is Currently Booked. Please Pick Another Seat. " ).length() + 20)));
+                    Thread.sleep(300);
+                }
+            } else if (reservation.equals("CANCEL")) {
+                if (!seat.isAvailable()) {
+                    do {
+                        if (handleWarning("This Will Cancel The Booking of Seat " + seat.getSeatID() + ".")) {
+                            cinema.cancelSeat(cinemaManager, seat.getSeatID());
+                            break;
+                        }
+                    } while (true);
+                } else {
+                    System.out.println(FontManager.warningCombo + "WARNING! Seat Is Still Available, Cannot Cancel Booking. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Seat Is Still Available, Cannot Cancel Booking. Please Try Again.".length()));
+                }
+            }
+        } else {
+            System.out.println(FontManager.warningCombo + Global.putSpaces(25) + "WARNING! Please Input The Right Seat Number. PLease Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Input The Right Seat Number. PLease Try Again...".length() + 25)));
+            Thread.sleep(300);
+        }
+    }
+    private static boolean handleWarning(String warning) {
+        Scanner input = new Scanner(System.in);
+        System.out.println(FontManager.warningCombo + "    WARNING! " + warning + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (warning).length()));
+        System.out.println(FontManager.primaryCombo + "    Would You Like To Continue (Yes/No): " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("    Would You Like To Continue (Yes/No): ").length()));
+        do {
+            Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+            System.out.print(FontManager.responseCombo + "Your Response - " + FontManager.RESET);
+            String warningChoice = input.nextLine().toUpperCase();
+            if (warningChoice.isBlank()) {
+                System.out.println(FontManager.warningCombo + "    WARNING! Please Don't Input Blank Texts. Please Try Again. " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "    WARNING! Don't Input Blank Texts ".length()));
+            } else if (warningChoice.equals("YES")) {
+                return true;
+            } else if (warningChoice.equals("NO")) {
+                return false;
+            }
+        } while (true);
+    }
+    private static void displayCinemas(CinemaManager cinemaManager) {
+        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+        System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "CINEMAS" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("CINEMAS".length() + 50)));
+        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+        System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
+        System.out.println(FontManager.secondaryCombo + "        " + Global.spacerString(51, ("Cinema " + FontManager.primaryCombo + "1: " + (!cinemaManager.getCinema("1").getMovie().getName().isEmpty() ? cinemaManager.getCinema("1").getMovie().getName() : "None"))) + FontManager.RESET + FontManager.secondaryCombo + "               " + Global.spacerString(50, ("Cinema " + FontManager.primaryCombo + "2: " + (!cinemaManager.getCinema("2").getMovie().getName().isEmpty() ? cinemaManager.getCinema("2").getMovie().getName() : "None"))) + "        " + FontManager.RESET);
+        System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
+        System.out.println(FontManager.secondaryCombo + "        " + Global.spacerString(51, ("Cinema " + FontManager.primaryCombo + "3: " + (!cinemaManager.getCinema("3").getMovie().getName().isEmpty() ? cinemaManager.getCinema("3").getMovie().getName() : "None"))) + FontManager.RESET + FontManager.secondaryCombo + "               " + Global.spacerString(50, ("Cinema " + FontManager.primaryCombo + "4: " + (!cinemaManager.getCinema("4").getMovie().getName().isEmpty() ? cinemaManager.getCinema("4").getMovie().getName() : "None"))) + "        " + FontManager.RESET);
+        System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
     }
     //Function to Display Seats
     private static void printDisplaySeats(Cinema cinema) {

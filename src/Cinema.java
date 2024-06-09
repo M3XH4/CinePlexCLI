@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Cinema {
@@ -45,15 +46,6 @@ public class Cinema {
         return seats;
     }
 
-    public boolean bookSeat(String seatID) {
-        for (Seat seat : seats) {
-            if (seat.getSeatID().equals(seatID) && seat.isAvailable()) {
-                seat.book();
-                return true;
-            }
-        }
-        return false;
-    }
     public int totalBookedSeats() {
         ArrayList<Seat> tempSeats = new ArrayList<>();
         for (Seat seat : seats) {
@@ -72,10 +64,23 @@ public class Cinema {
         }
         return tempSeats.size();
     }
-    public void cancelSeat(String seatID) {
+    public void bookSeat(CinemaManager cinemaManager, String seatID) throws InterruptedException, IOException {
+        for (Seat seat : seats) {
+            if (seat.getSeatID().equals(seatID) && seat.isAvailable()) {
+                seat.book();
+                FileManager.saveBookings(cinemaManager.getCinemas());
+                System.out.println(FontManager.primaryCombo + Global.putSpaces(42) + "Successfully Booked Seat " + seat.getSeatID() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (("Successfully Booked Seat " + seat.getSeatID()).length() + 42)));
+                Thread.sleep(300);
+            }
+        }
+    }
+    public void cancelSeat(CinemaManager cinemaManager, String seatID) throws IOException, InterruptedException {
         for (Seat seat : seats) {
             if (seat.getSeatID().equals(seatID)) {
                 seat.cancel();
+                FileManager.saveBookings(cinemaManager.getCinemas());
+                Thread.sleep(300);
+                System.out.println(FontManager.primaryCombo + "Successfully Cancelled The Booking of Seat " + seat.getSeatID() + "." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK,  MainClass.horizontalLineLength - ("Successfully Cancelled The Booking of Seat " + seat.getSeatID() + "." ).length()));
             }
         }
     }

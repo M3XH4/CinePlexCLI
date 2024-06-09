@@ -1,12 +1,12 @@
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ProductManager implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private ArrayList<Product> products;
-    private int length = 112;
 
     public ProductManager() {
         products = new ArrayList<>();
@@ -56,5 +56,34 @@ public class ProductManager implements Serializable {
             }
         }
         Global.putHorizontalLine(FontManager.primaryCombo, MainClass.horizontalLineLength);
+    }
+
+    public <T extends Product> Product findProduct(String name) {
+        for (Product product : products) {
+            if (product.getName().equalsIgnoreCase(name)) {
+                if (product instanceof Drinks) {
+                    return (Drinks) product;
+                } else {
+                    return product;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Drinks.Size getDrinksSize(Product product) {
+        Scanner input = new Scanner(System.in);
+        if (product instanceof Drinks) {
+            Drinks drinks = (Drinks) product;
+            do {
+                try {
+                    System.out.print(FontManager.responseCombo + "Select The Size of " + drinks.getName() + " (SMALL,MEDIUM,LARGE): " + FontManager.RESET);
+                    return Drinks.Size.valueOf(input.nextLine().toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Correct Size. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - "WARNING! Please Enter The Correct Size. Please Try Again.".length()));
+                }
+            } while (true);
+        }
+        return null; // Not a drink, so no size selection
     }
 }
