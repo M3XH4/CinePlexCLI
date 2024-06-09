@@ -61,8 +61,8 @@ public class ProductManager implements Serializable {
     public <T extends Product> Product findProduct(String name) {
         for (Product product : products) {
             if (product.getName().equalsIgnoreCase(name)) {
-                if (product instanceof Drinks) {
-                    return (Drinks) product;
+                if (product instanceof Drinks drinks) {
+                    return drinks;
                 } else {
                     return product;
                 }
@@ -73,8 +73,7 @@ public class ProductManager implements Serializable {
 
     public Drinks.Size getDrinksSize(Product product) {
         Scanner input = new Scanner(System.in);
-        if (product instanceof Drinks) {
-            Drinks drinks = (Drinks) product;
+        if (product instanceof Drinks drinks) {
             do {
                 try {
                     System.out.print(FontManager.responseCombo + "Select The Size of " + drinks.getName() + " (SMALL,MEDIUM,LARGE): " + FontManager.RESET);
@@ -84,6 +83,6 @@ public class ProductManager implements Serializable {
                 }
             } while (true);
         }
-        return null; // Not a drink, so no size selection
+        return null;
     }
 }

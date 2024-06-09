@@ -5,16 +5,26 @@ public class MainClass {
     public static int horizontalLineLength = horizontalLine.length();
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        //Initializing Variables
+        //Declaring Variables
         Scanner input = new Scanner(System.in);
         Admin admin = new Admin();
+        //Declaring Booleans For Showing Specified Displays
+        boolean showTitle;
+        boolean showAdminPage;
+        boolean showCinemas;
+        //Declaring Booleans For Looping
+        boolean admin_PageRunning = true;
+        boolean admin_EditCRunning  = true;
+        boolean admin_EditSRunning = true;
 
-        //Creating File
+        //Creating File If Files Exists Then Don't Create File But If It Exists
+        //Then Create A File For The File That Does Not Exist
         FileManager.createFile();
 
+        //Initializing Cinema Manager Object
         CinemaManager cinemaManager = new CinemaManager();
         //Loading Cinema's Data From File And If It Is Empty Then Initialize CinemaManager If Not Then Load The Cinema
-        //Admin With The Data From The File
+        //Manager With The Data From The File
         ArrayList<Cinema> loadCinema = FileManager.loadBookings();
         if (loadCinema.isEmpty()) {
             initializeCinemas(cinemaManager);
@@ -22,7 +32,10 @@ public class MainClass {
             cinemaManager.setCinemas(loadCinema);
         }
 
+        //Initializing Product Manager Object
         ProductManager productManager = new ProductManager();
+        //Loading Product's Data From File And If It Is Empty Then Initialize CinemaManager If Not Then Load The Product
+        //Manager With The Data From The File
         ArrayList<Product> loadProducts = FileManager.loadProducts();
         if (loadProducts != null && !loadProducts.isEmpty()) {
             productManager.setProducts(loadProducts);
@@ -30,35 +43,19 @@ public class MainClass {
             initializeProducts(productManager);
         }
 
-        //Loading Printer Data
+        //Loading Printer Data To Declare What Printer Is Being Used
         PrintManager.printer = FileManager.loadPrinter();
 
-        //Initializing Booleans For Looping
-        boolean showTitle;
-        boolean showAdminPage;
-        boolean showCinemas;
-        boolean admin_PageRunning = true;
-        boolean admin_EditCRunning  = true;
-        boolean admin_EditSRunning = true;
-
-        //Main Window
+        //Initiate Looping For The Main Window
         do {
             showTitle = true;
+            //Displaying Title Page
             if (showTitle) {
-                Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                System.out.println(Titles.title);
-                System.out.println(FontManager.tertiaryCombo + horizontalLine + FontManager.RESET);
-                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                System.out.println(FontManager.primaryCombo + "        BOOK" + FontManager.RESET + FontManager.secondaryCombo + ":    Book Seats For A Movie"  + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, (horizontalLineLength - "        BOOK:    Book Seats For A Movie".length())));
-                System.out.println(FontManager.primaryCombo + "        BUY" + FontManager.RESET + FontManager.secondaryCombo + ":     Buy Snacks And Drinks" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, (horizontalLineLength - "        BUY:     Buy Snacks And Drinks".length())));
-                System.out.println(FontManager.primaryCombo + "        EXIT" + FontManager.RESET + FontManager.secondaryCombo + ":    Quit Application" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, (horizontalLineLength - "        EXIT:    Quit Application".length())));
-                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
+                Titles.displayTitle();
             }
             showTitle = false;
 
+            //Asking User Which Option Would He Like To Do
             Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
             System.out.print(FontManager.responseCombo + "Which Option Would You Like To Do: " + FontManager.RESET);
             String choice = input.nextLine().toUpperCase();
@@ -116,9 +113,11 @@ public class MainClass {
                     productManager.displaySnacks();
                     productManager.displayDrinks();
                     Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                    System.out.print(FontManager.responseCombo + "Type In The Name Of The Product To Purchase It or Type in Back To Go Back To Main Page: " + FontManager.RESET);
+                    System.out.print(FontManager.responseCombo + "Type In The Name Of The Product To Purchase It or Type in Back To Go Back To Main Page");
                     if (loopRun == 1) {
-                        System.out.print(FontManager.responseCombo + "\nOr Type In Checkout To Purchase Products: " + FontManager.RESET);
+                        System.out.print(FontManager.responseCombo + " Or Type In Checkout\nTo Proceed To Purchase Items: " + FontManager.RESET);
+                    } else {
+                        System.out.print(": " + FontManager.RESET);
                     }
                     String purchaseChoice = input.nextLine();
                     if (purchaseChoice.equalsIgnoreCase("Back")) {
@@ -173,9 +172,9 @@ public class MainClass {
                     System.out.println(FontManager.primaryCombo + Global.putSpaces(43) + "ADMIN LOGIN" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("ADMIN LOGIN".length() + 43)));
                     Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                     System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                    System.out.println(FontManager.primaryCombo + "    Enter Username: " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "    Enter Username: ".length()));
+                    System.out.print(FontManager.primaryCombo + "    Enter Username: " + FontManager.RESET);
                     username = input.nextLine();
-                    System.out.println(FontManager.primaryCombo + "    Enter Password: " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "    Enter Password: ".length()));
+                    System.out.print(FontManager.primaryCombo + "    Enter Password: " + FontManager.RESET);
                     password = input.nextLine();
                     System.out.println(Global.putBackgroundColor( FontManager.BACKGROUND_BLACK, horizontalLineLength));
                 }
@@ -204,9 +203,8 @@ public class MainClass {
 
                         if (managerChoice.equals("CINEMAS")) {
                             Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                            System.out.println(FontManager.primaryCombo + Global.putSpaces(45) + "EDIT CINEMA" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("EDIT CINEMA".length() + 45)));
+                            System.out.println(FontManager.primaryCombo + Global.putSpaces(48) + "EDIT CINEMA" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("EDIT CINEMA".length() + 48)));
                             do {
-                                Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                                 try {
                                     displayCinemas(cinemaManager);
                                     System.out.print(FontManager.secondaryCombo + "Type In Cinema Number (1/2/3/4):" + FontManager.RESET + "  ");
@@ -236,13 +234,7 @@ public class MainClass {
                                                 if (cancelChoice.equalsIgnoreCase("Back")) {
                                                     break;
                                                 }
-                                                Seat seat = Cinema.findSeat(cinema.getSeats(), cancelChoice);
-                                                if (seat != null) {
-
-                                                } else {
-                                                    System.out.println(FontManager.warningCombo + Global.putSpaces(25) + "WARNING! Please Input The Right Seat Number. PLease Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Input The Right Seat Number. PLease Try Again...".length() + 25)));
-                                                    Thread.sleep(300);
-                                                }
+                                                handleSeatReservation(cinemaManager, cinema, cancelChoice, "CANCEL");
                                             } while (true);
                                         } else if (cinemaChoice.equals("CHANGE")) {
                                             Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
@@ -276,7 +268,6 @@ public class MainClass {
                                                 } else if (warningChoice.equals("NO")) {
                                                     break;
                                                 }
-
                                             } while (true);
                                         } else if (cinemaChoice.equals("BACK")) {
                                             admin_EditCRunning = false;
@@ -288,7 +279,6 @@ public class MainClass {
                                     System.out.println(FontManager.errorCombo + Global.putSpaces(36) + "Cinema Not Found. Please Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Cinema Not Found. Please Try Again...".length() + 36)));
                                     input.reset();
                                 }
-
                             } while (admin_EditCRunning);
                         } else if (managerChoice.equals("SNACKS")) {
                             do {
@@ -299,10 +289,90 @@ public class MainClass {
                                 System.out.println(FontManager.primaryCombo + "    ADD" + FontManager.secondaryCombo + ":    To Add Products" + Global.putSpaces(57) + FontManager.primaryCombo + "EDIT" + FontManager.TEXT_WHITE_BRIGHT + ": Edit Products" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, 9));
                                 System.out.println(FontManager.primaryCombo + "    DELETE" + FontManager.secondaryCombo + ": To Delete Products" + Global.putSpaces(54) + FontManager.primaryCombo + "BACK" + FontManager.TEXT_WHITE_BRIGHT + ": Back To Admin Page" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, 4));
                                 System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLine.length()));
-                                Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                                System.out.print(FontManager.responseCombo + "Choose Which Option Would You Like To Do: " + FontManager.RESET);
-                                String snacksChoice = input.nextLine();
-                            } while (true);
+                                do {
+                                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                    System.out.print(FontManager.responseCombo + "Choose Which Option Would You Like To Do: " + FontManager.RESET);
+                                    String snacksChoice = input.nextLine().toUpperCase();
+                                    if (snacksChoice.equals("ADD")) {
+                                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                        System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "ADD PRODUCT" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("ADD PRODUCT").length() + 50)));
+                                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                        System.out.print(FontManager.responseCombo + "Type In The Name Of The Product Or Type In Back To Go Back To Selection: " + FontManager.RESET);
+                                        String nameChoice = input.nextLine();
+                                        if (nameChoice.equalsIgnoreCase("Back")) {
+                                            break;
+                                        }
+                                        do {
+                                            System.out.print(FontManager.responseCombo + "What Is The Type Of The Product (Snacks/Drinks): " + FontManager.RESET);
+                                            String type = input.nextLine().toUpperCase();
+                                            if (type.equals("SNACKS")) {
+                                                do {
+                                                    try {
+                                                        System.out.print(FontManager.responseCombo + "What Is The Price Of " + nameChoice + ": " + FontManager.RESET);
+                                                        double price = input.nextDouble();
+                                                        input.nextLine();
+                                                        productManager.addProduct(new Snack(nameChoice, price));
+                                                        FileManager.saveProducts(productManager.getProducts());
+                                                        break;
+                                                    } catch (NumberFormatException e) {
+                                                        System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount.".length()));
+                                                    }
+                                                } while (true);
+                                                break;
+                                            } else if (type.equals("DRINKS")) {
+                                                do {
+                                                    try {
+                                                        System.out.print(FontManager.responseCombo + "What Is The Price Of Small Size Of " + nameChoice + ": " + FontManager.RESET);
+                                                        double price = input.nextDouble();
+                                                        input.nextLine();
+                                                        productManager.addProduct(new Drinks(nameChoice, price, Drinks.Size.SMALL));
+                                                        FileManager.saveProducts(productManager.getProducts());
+                                                        break;
+                                                    } catch (NumberFormatException e) {
+                                                        System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount.".length()));
+                                                    }
+                                                } while (true);
+                                                do {
+                                                    try {
+                                                        System.out.print(FontManager.responseCombo + "What Is The Price Of Medium Size Of " + nameChoice + ": " + FontManager.RESET);
+                                                        double price = input.nextDouble();
+                                                        input.nextLine();
+                                                        productManager.addProduct(new Drinks(nameChoice, price, Drinks.Size.MEDIUM));
+                                                        FileManager.saveProducts(productManager.getProducts());
+                                                        break;
+                                                    } catch (NumberFormatException e) {
+                                                        System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount.".length()));
+                                                    }
+                                                } while (true);
+                                                do {
+                                                    try {
+                                                        System.out.print(FontManager.responseCombo + "What Is The Price Of Large Size Of " + nameChoice + ": " + FontManager.RESET);
+                                                        double price = input.nextDouble();
+                                                        input.nextLine();
+                                                        productManager.addProduct(new Drinks(nameChoice, price, Drinks.Size.LARGE));
+                                                        FileManager.saveProducts(productManager.getProducts());
+                                                        break;
+                                                    } catch (NumberFormatException e) {
+                                                        System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount.".length()));
+                                                    }
+                                                } while (true);
+                                                break;
+                                            }
+                                        } while (true);
+                                    } else if (snacksChoice.equals("EDIT")) {
+                                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                        System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "EDIT PRODUCT" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("EDIT PRODUCT").length() + 50)));
+                                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                    } else if (snacksChoice.equals("DELETE")) {
+                                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                        System.out.println(FontManager.primaryCombo + Global.putSpaces(49) + "DELETE PRODUCT" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("DELETE PRODUCT").length() + 49)));
+                                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                    } else if (snacksChoice.equals("BACK")) {
+                                        admin_EditSRunning = false;
+                                        break;
+                                    }
+                                } while (true);
+                            } while (admin_EditSRunning);
                         } else if (managerChoice.equals("PRINTER")) {
                             do {
                                 Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
@@ -475,9 +545,12 @@ public class MainClass {
     private static void initializeProducts(ProductManager productManager) throws IOException {
         productManager.addProduct(new Snack("Popcorn", 45.00));
         productManager.addProduct(new Snack("Fries", 35.00));
-        productManager.addProduct(new Drinks("Coke", 20.00, Drinks.Size.SMALL));
-        productManager.addProduct(new Drinks("Coke", 30.00, Drinks.Size.MEDIUM));
-        productManager.addProduct(new Drinks("Coke", 35.00, Drinks.Size.LARGE));
+        productManager.addProduct(new Drinks("Water", 15.00, Drinks.Size.SMALL));
+        productManager.addProduct(new Drinks("Water", 25.00, Drinks.Size.LARGE));
+        productManager.addProduct(new Drinks("Water", 20.00, Drinks.Size.MEDIUM));
+        productManager.addProduct(new Drinks("Coke", 25.00, Drinks.Size.SMALL));
+        productManager.addProduct(new Drinks("Coke", 35.00, Drinks.Size.MEDIUM));
+        productManager.addProduct(new Drinks("Coke", 40.00, Drinks.Size.LARGE));
         FileManager.saveProducts(productManager.getProducts());
     }
     //Function For Wrapping Text
