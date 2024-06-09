@@ -61,7 +61,7 @@ class Drinks extends Product implements Serializable {
     public Drinks(String name, double price, Size size) {
         super(name, price);
         setSize(size);
-        getSize().setPrice(price);
+        setPriceForSize(size, price);
     }
     // Get the price for a specific size
     public double getPriceForSize(Size size) {

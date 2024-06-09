@@ -136,66 +136,75 @@ public class MainClass {
                 ArrayList<Product> shoppingCart = new ArrayList<>();
                 ArrayList<Integer> quantities = new ArrayList<>();
                 double total = 0;
-
+                int loopRun = 0;
+                String addChoice = "";
+                boolean checkout = false;
                 do {
                     productManager.displaySnacks();
                     productManager.displayDrinks();
                     Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                     System.out.print(FontManager.responseCombo + "Type In The Name Of The Product To Purchase It or Type in Back To Go Back To Main Page: " + FontManager.RESET);
+                    if (loopRun == 1) {
+                        System.out.print(FontManager.responseCombo + "\nOr Type In Checkout To Purchase Products: " + FontManager.RESET);
+                        checkout = true;
+                    }
                     String purchaseChoice = input.nextLine();
                     if (purchaseChoice.equalsIgnoreCase("Back")) {
                         break;
-                    }
+                    } else if (!purchaseChoice.equalsIgnoreCase("Checkout")) {
 
-                    Product selectedProduct = null;
-                    Drinks.Size selectedSize = null;
-                    for (Product product : productManager.getProducts()) {
-                        if (product instanceof Drinks drinks) {
-                            for (Drinks.Size size : Drinks.Size.values()) {
-                                if (drinks.getName().equalsIgnoreCase(purchaseChoice) && selectedProduct == null) {
-                                    selectedProduct = drinks;
-                                    selectedSize = size;
+                        Product selectedProduct = null;
+                        Drinks.Size selectedSize = null;
+                        for (Product product : productManager.getProducts()) {
+                            if (product instanceof Drinks drinks) {
+                                for (Drinks.Size size : Drinks.Size.values()) {
+                                    if (drinks.getName().equalsIgnoreCase(purchaseChoice) && selectedProduct == null) {
+                                        selectedProduct = drinks;
+                                        selectedSize = size;
+                                    }
                                 }
+                            } else if (product.getName().equalsIgnoreCase(purchaseChoice)) {
+                                selectedProduct = product;
                             }
-                        } else if (product.getName().equalsIgnoreCase(purchaseChoice)) {
-                            selectedProduct = product;
                         }
-                    }
 
-                    if (selectedProduct == null) {
-                        System.out.println(FontManager.warningCombo + "WARNING! Please Type In The Right Product Name. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Type In The Right Product Name. Please Try Again.".length()));
-                        continue;
-                    }
-                    if (selectedProduct instanceof Drinks) {
-                        do {
-                            try {
-                                System.out.print(FontManager.responseCombo + "Select The Size of " + selectedProduct.getName() + " (SMALL,MEDIUM,LARGE): " + FontManager.RESET);
-                                selectedSize = Drinks.Size.valueOf(input.nextLine().toUpperCase());
-                                break;
-                            } catch (IllegalArgumentException e) {
-                                System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Correct Size. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Correct Size. Please Try Again.".length()));
-                            }
-                        } while (true);
-                    }
-                    System.out.print(FontManager.responseCombo + "How Many " + selectedProduct.getName() + " Are You Purchasing: " + FontManager.RESET);
-                    int quantity = input.nextInt();
-                    input.nextLine();
+                        if (selectedProduct == null) {
+                            System.out.println(FontManager.warningCombo + "WARNING! Please Type In The Right Product Name. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Type In The Right Product Name. Please Try Again.".length()));
+                            continue;
+                        }
+                        if (selectedProduct instanceof Drinks) {
+                            do {
+                                try {
+                                    System.out.print(FontManager.responseCombo + "Select The Size of " + selectedProduct.getName() + " (SMALL,MEDIUM,LARGE): " + FontManager.RESET);
+                                    selectedSize = Drinks.Size.valueOf(input.nextLine().toUpperCase());
+                                    break;
+                                } catch (IllegalArgumentException e) {
+                                    System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Correct Size. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Correct Size. Please Try Again.".length()));
+                                }
+                            } while (true);
+                        }
+                        
+                        System.out.print(FontManager.responseCombo + "How Many " + selectedProduct.getName() + " Are You Purchasing: " + FontManager.RESET);
+                        int quantity = input.nextInt();
+                        input.nextLine();
 
-                    if (selectedProduct instanceof Drinks drinks) {
-                        total += drinks.getPriceForSize(selectedSize) * quantity;
-                    } else {
-                        total += selectedProduct.getPrice() * quantity;
+                        if (selectedProduct instanceof Drinks drinks) {
+                            total += ((Drinks) selectedProduct).getPriceForSize(selectedSize) * quantity;
+                        } else {
+                            total += selectedProduct.getPrice() * quantity;
+                        }
+                        shoppingCart.add(selectedProduct);
+                        quantities.add(quantity);
+                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                        System.out.println(FontManager.primaryCombo + String.format("Total Cost: %.2f PHP", total) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Total Cost: %.2f PHP", total).length()));
+                        Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                        System.out.print(FontManager.responseCombo + "Do You Want To Add Another Product (Yes/No): " + FontManager.RESET);
+                        addChoice = input.nextLine().toUpperCase();
+                        loopRun++;
                     }
-                    shoppingCart.add(selectedProduct);
-                    quantities.add(quantity);
-                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                    System.out.println(FontManager.primaryCombo + String.format("Total Cost: %.2f PHP", total) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Total Cost: %.2f PHP", total).length()));
-                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                    System.out.print(FontManager.responseCombo + "Do You Want To Add Another Product (Yes/No): " + FontManager.RESET);
-                    String addChoice = input.nextLine().toUpperCase();
                     if (addChoice.equals("YES")) {
                         continue;
-                    } else if (addChoice.equals("NO")) {
+                    } else if (addChoice.equals("NO") || purchaseChoice.equalsIgnoreCase("Checkout")) {
                         do {
                             System.out.print(FontManager.responseCombo + "Enter The Amount To Pay Or Type 'Cancel' To Cancel The Purchase: " + FontManager.RESET);
                             String payment = input.nextLine();
@@ -222,7 +231,6 @@ public class MainClass {
                         System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Right Choices. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Right Choices. Please Try Again.".length()));
                     }
                 } while (true);
-
             } else if (choice.equals("LOGIN")) {
                 String username = "";
                 String password = "";
