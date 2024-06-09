@@ -320,53 +320,89 @@ public class MainClass {
                                                 } while (true);
                                                 break;
                                             } else if (type.equals("DRINKS")) {
-                                                do {
-                                                    try {
-                                                        System.out.print(FontManager.responseCombo + "What Is The Price Of Small Size Of " + nameChoice + ": " + FontManager.RESET);
-                                                        double price = input.nextDouble();
-                                                        input.nextLine();
-                                                        productManager.addProduct(new Drinks(nameChoice, price, Drinks.Size.SMALL));
-                                                        FileManager.saveProducts(productManager.getProducts());
-                                                        break;
-                                                    } catch (NumberFormatException e) {
-                                                        System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount.".length()));
-                                                    }
-                                                } while (true);
-                                                do {
-                                                    try {
-                                                        System.out.print(FontManager.responseCombo + "What Is The Price Of Medium Size Of " + nameChoice + ": " + FontManager.RESET);
-                                                        double price = input.nextDouble();
-                                                        input.nextLine();
-                                                        productManager.addProduct(new Drinks(nameChoice, price, Drinks.Size.MEDIUM));
-                                                        FileManager.saveProducts(productManager.getProducts());
-                                                        break;
-                                                    } catch (NumberFormatException e) {
-                                                        System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount.".length()));
-                                                    }
-                                                } while (true);
-                                                do {
-                                                    try {
-                                                        System.out.print(FontManager.responseCombo + "What Is The Price Of Large Size Of " + nameChoice + ": " + FontManager.RESET);
-                                                        double price = input.nextDouble();
-                                                        input.nextLine();
-                                                        productManager.addProduct(new Drinks(nameChoice, price, Drinks.Size.LARGE));
-                                                        FileManager.saveProducts(productManager.getProducts());
-                                                        break;
-                                                    } catch (NumberFormatException e) {
-                                                        System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount.".length()));
-                                                    }
-                                                } while (true);
+                                                for (Drinks.Size size : Drinks.Size.values()) {
+                                                    productManager.addDrink(nameChoice, size);
+                                                }
                                                 break;
                                             }
                                         } while (true);
+                                        break;
                                     } else if (snacksChoice.equals("EDIT")) {
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                                         System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "EDIT PRODUCT" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("EDIT PRODUCT").length() + 50)));
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                        do {
+                                            System.out.print(FontManager.primaryCombo + "Enter The Name Of The Product To Be Deleted Or Type In Back To Go Back To Selection: " + FontManager.RESET);
+                                            String nameChoice = input.nextLine();
+                                            if (nameChoice.equalsIgnoreCase("Back")) {
+                                                break;
+                                            }
+                                            ArrayList<Product> products = productManager.findProductsByName(nameChoice);
+                                            if (products.isEmpty()) {
+                                                System.out.println(FontManager.warningCombo + "WARNING! No Products Found With The Name: " + nameChoice + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! No Products Found With The Name: " + nameChoice).length()));
+                                                continue;
+                                            }
+                                            for (Product product : products) {
+                                                System.out.println(FontManager.primaryCombo + "Enter New Name For " + product.getName() + " Or Leave Blank For Default: " + FontManager.RESET);
+                                                String newName = input.nextLine();
+                                                if (product instanceof Drinks drinks) {
+                                                    do {
+                                                        try {
+                                                            System.out.print("Enter New Price For " + drinks.getName() + "- " + drinks.getSize() + "Or Leave Blank For Default: ");
+                                                            double newPrice = input.nextDouble();
+                                                            input.nextLine();
+                                                            if (!(newPrice > 0)) {
+                                                                System.out.print(FontManager.warningCombo + "WARNING! Please Don't Enter A Negative Amount. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Don't Enter A Negative Amount. Please Try Again.").length()));
+                                                                continue;
+                                                            }
+                                                            productManager.updateProduct(drinks, newName, newPrice);
+                                                            break;
+                                                        } catch (NumberFormatException e) {
+                                                            System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount Or Text." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount Or Text.".length()));
+                                                        }
+                                                    } while (true);
+                                                } else {
+                                                    do {
+                                                        try {
+                                                            System.out.print("Enter New Price For " + product.getName() +  "Or Leave Blank For Default: ");
+                                                            double newPrice = input.nextInt();
+                                                            input.nextLine();
+                                                            if (!(newPrice > 0)) {
+                                                                System.out.print(FontManager.warningCombo + "WARNING! Please Don't Enter A Negative Amount. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Don't Enter A Negative Amount. Please Try Again.").length()));
+                                                                continue;
+                                                            }
+                                                            productManager.updateProduct(product, newName, newPrice);
+                                                            break;
+                                                        } catch (NumberFormatException e) {
+                                                            System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount Or Text." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount Or Text.".length()));
+                                                        }
+                                                    } while (true);
+                                                }
+                                            }
+                                            break;
+                                        } while (true);
+                                        break;
                                     } else if (snacksChoice.equals("DELETE")) {
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                                         System.out.println(FontManager.primaryCombo + Global.putSpaces(49) + "DELETE PRODUCT" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("DELETE PRODUCT").length() + 49)));
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                        do {
+                                            System.out.print(FontManager.responseCombo + "Enter The Name Of The Product To Be Deleted Or Type In Back To Go Back To Selections: " + FontManager.RESET);
+                                            String nameChoice = input.nextLine();
+                                            if (nameChoice.equalsIgnoreCase("Back")) {
+                                                break;
+                                            }
+                                            ArrayList<Product> products = productManager.findProductsByName(nameChoice);
+                                            if (products.isEmpty()) {
+                                                System.out.println(FontManager.warningCombo + "WARNING! No Products Found With The Name: " + nameChoice + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! No Products Found With The Name: " + nameChoice).length()));
+                                                continue;
+                                            }
+                                            for (Product product : products) {
+                                                productManager.removeProduct(product);
+                                            }
+                                            break;
+                                        } while (true);
+                                        break;
                                     } else if (snacksChoice.equals("BACK")) {
                                         admin_EditSRunning = false;
                                         break;
@@ -546,8 +582,8 @@ public class MainClass {
         productManager.addProduct(new Snack("Popcorn", 45.00));
         productManager.addProduct(new Snack("Fries", 35.00));
         productManager.addProduct(new Drinks("Water", 15.00, Drinks.Size.SMALL));
-        productManager.addProduct(new Drinks("Water", 25.00, Drinks.Size.LARGE));
         productManager.addProduct(new Drinks("Water", 20.00, Drinks.Size.MEDIUM));
+        productManager.addProduct(new Drinks("Water", 25.00, Drinks.Size.LARGE));
         productManager.addProduct(new Drinks("Coke", 25.00, Drinks.Size.SMALL));
         productManager.addProduct(new Drinks("Coke", 35.00, Drinks.Size.MEDIUM));
         productManager.addProduct(new Drinks("Coke", 40.00, Drinks.Size.LARGE));

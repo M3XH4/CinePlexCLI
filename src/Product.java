@@ -1,5 +1,6 @@
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Scanner;
 
 public abstract class Product implements Serializable {
     @Serial
@@ -72,6 +73,7 @@ class Drinks extends Product implements Serializable {
     public void setPriceForSize(Size size, double price) {
         size.setPrice(price);
     }
+
     public Size getSize() {
         return size;
     }
@@ -79,5 +81,6 @@ class Drinks extends Product implements Serializable {
     public void setSize(Size size) {
         this.size = size;
     }
+
 
 }

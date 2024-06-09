@@ -1,7 +1,10 @@
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ProductManager implements Serializable {
     @Serial
@@ -22,13 +25,32 @@ public class ProductManager implements Serializable {
     public void addProduct(Product product) {
         products.add(product);
     }
-    public void removeProduct(Product product) {
+    public ArrayList<Product> findProductsByName(String name) {
+        return (ArrayList<Product>) products.stream().filter(product -> product.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
+    }
+    public void removeProduct(Product product) throws IOException {
         products.remove(product);
+        FileManager.saveProducts(getProducts());
+        if (product instanceof Drinks drinks) {
+            System.out.println(FontManager.primaryCombo + drinks.getName() + "- " + drinks.getSize() + " Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (drinks.getName() + "- " + drinks.getSize() + " Successfully Deleted...").length()));
+        } else {
+            System.out.println(FontManager.primaryCombo + product.getName() + " Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (product.getName() + " Successfully Deleted...").length()));
+        }
+
     }
+
     public void updateProduct(Product product, String name, double price) {
-        product.setName(name);
-        product.setPrice(price);
+        String tempName = (name.isBlank()) ? product.getName() : name;
+        double tempPrice = (String.valueOf(price).isBlank()) ? product.getPrice() : price;
+
+        product.setName(tempName);
+        if (product instanceof Drinks drinks) {
+            drinks.setPriceForSize(drinks.getSize(), tempPrice);
+        } else {
+            product.setPrice(tempPrice);
+        }
     }
+
     public void displaySnacks() {
         Global.putHorizontalLine(FontManager.tertiaryCombo, MainClass.horizontalLineLength);
         System.out.println(FontManager.primaryCombo + "|" + Global.putSpaces(51) + "SNACKS" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - ("SNACKS".length() + 53)) + FontManager.primaryCombo + "|" + FontManager.RESET);
@@ -84,5 +106,21 @@ public class ProductManager implements Serializable {
             } while (true);
         }
         return null;
+    }
+    public void addDrink(String name, Drinks.Size size) throws IOException {
+        Scanner input =new Scanner(System.in);
+        do {
+            try {
+                System.out.print(FontManager.responseCombo + "What Is The Price Of " + size + " Size Of " + name + ": " + FontManager.RESET);
+                double price = input.nextDouble();
+                input.nextLine();
+                addProduct(new Drinks(name, price, size));
+                FileManager.saveProducts(getProducts());
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount.");
+                input.nextLine();
+            }
+        } while (true);
     }
 }
