@@ -3,37 +3,40 @@ import java.util.*;
 public class MainClass {
     private static final String horizontalLine = "================================================================================================================";
     public static int horizontalLineLength = horizontalLine.length();
+
+    // Initializing Cinema Manager Object
+    public static CinemaManager cinemaManager = new CinemaManager();
+    // Initializing Product Manager Object
     public static ProductManager productManager = new ProductManager();
+
     public static void main(String[] args) throws IOException, InterruptedException {
-        //Declaring Variables
+        // Declaring Variables
         Scanner input = new Scanner(System.in);
         Admin admin = new Admin();
 
-        //Declaring Booleans For Showing Specified Displays
+        // Declaring Booleans For Showing Specified Displays
         boolean showTitle;
         boolean showAdminPage;
         boolean showCinemas;
-        //Declaring Booleans For Looping
+        // Declaring Booleans For Looping
         boolean shopRunning;
         boolean adminPageRunning = true;
         boolean adminEditCRunning  = true;
         boolean adminEditSRunning = true;
-        //Creating File If Files Exists Then Don't Create File But If It Exists
-        //Then Create A File For The File That Does Not Exist
+        // Creating File If Files Exists Then Don't Create File But If It Exists
+        // Then Create A File For The File That Does Not Exist
         FileManager.createFile();
 
-        //Initializing Cinema Manager Object
-        CinemaManager cinemaManager = new CinemaManager();
-        //Loading Cinema's Data From File And If It Is Empty Then Initialize CinemaManager If Not Then Load The Cinema
-        //Manager With The Data From The File
+        // Loading Cinema's Data From File And If It Is Empty Then Initialize CinemaManager If Not Then Load The Cinema
+        // Manager With The Data From The File
         ArrayList<Cinema> loadCinema = FileManager.loadBookings();
+        // If File Is Empty Then Load The Cinema Manager With Default Values Else Then Put The Values On The File
+        // To The File Manager
         if (loadCinema.isEmpty()) {
             initializeCinemas(cinemaManager);
         } else {
             cinemaManager.setCinemas(loadCinema);
         }
-
-        //Initializing Product Manager Object
 
         //Loading Product's Data From File And If It Is Empty Then Initialize CinemaManager If Not Then Load The Product
         //Manager With The Data From The File
@@ -47,7 +50,10 @@ public class MainClass {
         //Loading Printer Data To Declare What Printer Is Being Used
         PrintManager.printer = FileManager.loadPrinter();
 
-        //Initiate Looping For The Main Window
+        /* Initiate Looping on This Part So That It Would Always Execute The Code Blocks
+           Again and Again Unless The User Chooses To Exit The Application Which Will Stop
+           The Loop And Terminate The Program
+        */
         do {
             showTitle = true;
             //Displaying Title Page
@@ -56,11 +62,11 @@ public class MainClass {
             }
             showTitle = false;
 
-            //Asking User Which Option Would He Like To Do
+            //Asking User Which Option Would He Like To Do Either Booking, Buying, Or Exit Application
             Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
             System.out.print(FontManager.responseCombo + "Which Option Would You Like To Do: " + FontManager.RESET);
             String choice = input.nextLine().toUpperCase();
-
+            //On This If-ElseIf-Else Statement
             if (choice.equals("BOOK")) {
                 do {
                     showCinemas = true;
@@ -126,12 +132,10 @@ public class MainClass {
                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                         System.out.println(FontManager.primaryCombo + String.format("Total Cost: %.2f PHP", total) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Total Cost: %.2f PHP", total).length()));
                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                        if (!handlePayment(total)) {
+                        if (handlePayment(true, total)) {
                             shopRunning = false;
-                            break;
-                        } else {
-                            break;
                         }
+                        break;
                     } else {
                         Product selectedProduct = productManager.findProduct(purchaseChoice);
                         if (selectedProduct == null) {
@@ -163,12 +167,10 @@ public class MainClass {
                                 break;
                             }
                             if (addChoice.equals("NO")) {
-                                if (!handlePayment(total)) {
+                                if (handlePayment(true, total)) {
                                     shopRunning = false;
-                                    break;
-                                } else {
-                                    break;
                                 }
+                                break;
                             } else {
                                 System.out.println(FontManager.warningCombo + "WARNING! Please Enter The Right Choices. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Please Enter The Right Choices. Please Try Again.".length()));
                                 continue;
@@ -177,23 +179,17 @@ public class MainClass {
                     }
                 } while (shopRunning);
             } else if (choice.equals("LOGIN")) {
-                String username = "";
-                String password = "";
+                Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                System.out.println(FontManager.primaryCombo + Global.putSpaces(43) + "ADMIN LOGIN" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("ADMIN LOGIN".length() + 43)));
+                Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
+                System.out.print(FontManager.primaryCombo + "    Enter Username: " + FontManager.RESET);
+                String username = input.nextLine();
+                System.out.print(FontManager.primaryCombo + "    Enter Password: " + FontManager.RESET);
+                String password = input.nextLine();
+                System.out.println(Global.putBackgroundColor( FontManager.BACKGROUND_BLACK, horizontalLineLength));
 
-                if (!admin.isActive()) {
-                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                    System.out.println(FontManager.primaryCombo + Global.putSpaces(43) + "ADMIN LOGIN" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("ADMIN LOGIN".length() + 43)));
-                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
-                    System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                    System.out.print(FontManager.primaryCombo + "    Enter Username: " + FontManager.RESET);
-                    username = input.nextLine();
-                    System.out.print(FontManager.primaryCombo + "    Enter Password: " + FontManager.RESET);
-                    password = input.nextLine();
-                    System.out.println(Global.putBackgroundColor( FontManager.BACKGROUND_BLACK, horizontalLineLength));
-                }
-
-                if ((username.equals(admin.getUsername()) && password.equals(admin.getPassword())) || admin.isActive()) {
-                    admin.setActive(true);
+                if ((username.equals(admin.getUsername()) && password.equals(admin.getPassword()))) {
                     do {
                         showAdminPage = true;
                         if (showAdminPage) {
@@ -307,7 +303,6 @@ public class MainClass {
                                     System.out.print(FontManager.responseCombo + "Choose Which Option Would You Like To Do: " + FontManager.RESET);
                                     String snacksChoice = input.nextLine().toUpperCase();
                                     if (snacksChoice.equals("ADD")) {
-                                        boolean addRunning = true;
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                                         System.out.println(FontManager.primaryCombo + Global.putSpaces(50) + "ADD PRODUCT" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("ADD PRODUCT").length() + 50)));
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
@@ -366,7 +361,7 @@ public class MainClass {
                                                     break;
                                                 }
                                             }
-                                        } while (addRunning);
+                                        } while (true);
                                         break;
                                     } else if (snacksChoice.equals("EDIT")) {
                                         Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
@@ -528,7 +523,7 @@ public class MainClass {
             }
         } while (true);
     }
-    private static boolean handlePayment(double total) {
+    private static boolean handlePayment(boolean printReceipt, double total) {
         do {
             Scanner input = new Scanner(System.in);
             System.out.print(FontManager.responseCombo + "Enter The Amount To Pay Or Type 'Cancel' To Cancel The Purchase: " + FontManager.RESET);
@@ -543,7 +538,9 @@ public class MainClass {
                 if (paymentAmount >= total) {
                     double change = paymentAmount - total;
                     System.out.println(FontManager.primaryCombo + String.format("Payment Accepted. Your Change Is %.2f PHP", change) + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - String.format("Payment Accepted. Your Change Is %.2f PHP", change).length()));
-                    PrintManager.print(productManager.getShoppingCart(), productManager.getQuantities(), productManager.getSizes(), total, paymentAmount, change);
+                    if (printReceipt) {
+                        PrintManager.print(productManager.getShoppingCart(), productManager.getQuantities(), productManager.getSizes(), total, paymentAmount, change);
+                    }
                     return true;
                 } else {
                     System.out.println(FontManager.warningCombo + "WARNING! Insufficient Amount. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Insufficient Amount. Please Try Again.".length()));
@@ -558,7 +555,7 @@ public class MainClass {
         if (seat != null) {
             if (reservation.equals("BOOK")) {
                 if (seat.isAvailable()) {
-                    if (handlePayment(250.00)) {
+                    if (handlePayment(false,250.00)) {
                         cinema.bookSeat(cinemaManager, seatNumber);
                         Thread.sleep(300);
                         PrintManager.print(cinema.getMovie().getName(), cinema.getId(), seat.getSeatID());

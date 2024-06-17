@@ -2,20 +2,9 @@ public class Admin {
     private String username;
     private String password;
 
-    private boolean isActive;
-
     public Admin() {
         setUsername("manager");
         setPassword("man123");
-        setActive(false);
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
     }
 
     public String getPassword() {

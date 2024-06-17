@@ -46,7 +46,7 @@ class Drinks extends Product implements Serializable {
     public enum Size {
         SMALL,
         MEDIUM,
-        LARGE;
+        LARGE
     }
     private Map<Size, Double> prices;
     public Drinks(String name, double smallPrice, double mediumPrice, double largePrice) {

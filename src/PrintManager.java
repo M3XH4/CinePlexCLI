@@ -24,9 +24,8 @@ public class PrintManager {
         System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "    Current Printer: " + FontManager.BOLD + printServices[printer].getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - ("Current Printer: " + FontManager.BOLD + printServices[printer].getName()).length()));
     }
 
-    public static void print(String movie, String cinemaCode, String seat) {
+    public static void executePrint(Printable printable, double paperHeight) {
         PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-
         PrinterJob printerJob = PrinterJob.getPrinterJob();
 
         if (printServices.length > 0) {
@@ -40,30 +39,12 @@ public class PrintManager {
             return;
         }
 
-        Printable printable = new Printable() {
-            @Override
-            public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-                if (pageIndex > 0) {
-                    return Printable.NO_SUCH_PAGE;
-                }
-
-                Graphics2D g2D = (Graphics2D) graphics;
-                g2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-
-
-                ReceiptTemplate.receiptSeats(g2D, movie, cinemaCode, seat);
-
-                return Printable.PAGE_EXISTS;
-            }
-        };
-
         PageFormat pageFormat = new PageFormat();
         Paper paper = new Paper();
-
-        paper.setSize(width, height);
-        paper.setImageableArea(0,0, width, height);
+        double tempHeight = (paperHeight != 0) ? paperHeight : pageFormat.getImageableHeight();
+        paper.setSize(width, tempHeight);
+        paper.setImageableArea(0, 0, width, tempHeight);
         pageFormat.setPaper(paper);
-
         pageFormat.setOrientation(PageFormat.PORTRAIT);
         Book book = new Book();
         book.append(printable, pageFormat);
@@ -76,58 +57,25 @@ public class PrintManager {
             System.out.println("Error Printing: " + e.getMessage());
         }
     }
-    public static void print(ArrayList<Product> shoppingCart, ArrayList<Integer> quantities, ArrayList<Drinks.Size> sizes, double totalCost, double cash, double change) {
-        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-
-        PrinterJob printerJob = PrinterJob.getPrinterJob();
-
-        if (printServices.length > 0) {
-            try {
-                printerJob.setPrintService(printServices[printer]);
-            } catch (PrinterException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            System.out.println("Error!!! No Printer Found.");
-            return;
-        }
-
-        Printable printable = new Printable() {
-            @Override
-            public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-                if (pageIndex > 0) {
-                    return Printable.NO_SUCH_PAGE;
-                }
-
-                Graphics2D g2D = (Graphics2D) graphics;
-                g2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-
-
-                ReceiptTemplate.receiptShop(g2D, shoppingCart, quantities, sizes, totalCost, cash, change);
-
-                return Printable.PAGE_EXISTS;
-            }
+    public static void print(String movie, String cinemaCode, String seat) {
+        Printable printable = (graphics, pageFormat, pageIndex) -> {
+            if (pageIndex > 0) return Printable.NO_SUCH_PAGE;
+            Graphics2D g2D = (Graphics2D) graphics;
+            g2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+            ReceiptTemplate.receiptSeats(g2D, movie, cinemaCode, seat);
+            return Printable.PAGE_EXISTS;
         };
-
-        PageFormat pageFormat = new PageFormat();
-        Paper paper = new Paper();
-
-        paper.setSize(width, pageFormat.getImageableHeight());
-        paper.setImageableArea(0,0, width, pageFormat.getImageableHeight());
-        pageFormat.setPaper(paper);
-
-
-        pageFormat.setOrientation(PageFormat.PORTRAIT);
-        Book book = new Book();
-        book.append(printable, pageFormat);
-        printerJob.setPageable(book);
-
-        try {
-            printerJob.print();
-            System.out.println("Receipt printed successfully...");
-        } catch (PrinterException e) {
-            System.out.println("Error Printing: " + e.getMessage());
-        }
+        executePrint(printable, height);
+    }
+    public static void print(ArrayList<Product> shoppingCart, ArrayList<Integer> quantities, ArrayList<Drinks.Size> sizes, double totalCost, double cash, double change) {
+        Printable printable = (graphics, pageFormat, pageIndex) -> {
+            if (pageIndex > 0) return Printable.NO_SUCH_PAGE;
+            Graphics2D g2D = (Graphics2D) graphics;
+            g2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+            ReceiptTemplate.receiptShop(g2D, shoppingCart, quantities, sizes, totalCost, cash, change);
+            return Printable.PAGE_EXISTS;
+        };
+        executePrint(printable, 0);
     }
 }
 
