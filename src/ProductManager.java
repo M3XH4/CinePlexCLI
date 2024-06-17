@@ -19,16 +19,13 @@ public class ProductManager implements Serializable {
         setQuantities(new ArrayList<>());
         setSizes(new ArrayList<>());
     }
+
     public ArrayList<Product> getProducts() {
         return products;
     }
 
     public void setProducts(ArrayList<Product> products) {
         this.products = products;
-    }
-
-    public void addProduct(Product product) {
-        products.add(product);
     }
 
     public ArrayList<Integer> getQuantities() {
@@ -55,14 +52,19 @@ public class ProductManager implements Serializable {
         this.sizes = sizes;
     }
 
+    public void addProduct(Product product) {
+        products.add(product);
+    }
+
     public ArrayList<Product> findProductsByName(String name) {
         return (ArrayList<Product>) products.stream().filter(product -> product.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
     }
+
     public void removeProduct(Product product) throws IOException {
         products.remove(product);
         FileManager.saveProducts(getProducts());
         if (product instanceof Drinks drinks) {
-            System.out.println(FontManager.primaryCombo + drinks.getName() + "- " + drinks.getSize(drinks.getPrice()) + " Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (drinks.getName() + "- " + drinks.getSize(drinks.getPrice()) + " Successfully Deleted...").length()));
+            System.out.println(FontManager.primaryCombo + drinks.getName() + " (" + drinks.getSize(drinks.getPrice()) + ") Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (drinks.getName() + " (" + drinks.getSize(drinks.getPrice()) + ") Successfully Deleted...").length()));
         } else {
             System.out.println(FontManager.primaryCombo + product.getName() + " Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (product.getName() + " Successfully Deleted...").length()));
         }
@@ -112,7 +114,7 @@ public class ProductManager implements Serializable {
         Global.putHorizontalLine(FontManager.primaryCombo, MainClass.horizontalLineLength);
     }
 
-    public <T extends Product> Product findProduct(String name) {
+    public Product findProduct(String name) {
         for (Product product : products) {
             if (product.getName().equalsIgnoreCase(name)) {
                 if (product instanceof Drinks drinks) {
@@ -139,4 +141,5 @@ public class ProductManager implements Serializable {
         }
         return null;
     }
+
 }

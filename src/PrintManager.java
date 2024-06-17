@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class PrintManager {
-    public static int printer = 5;
+    public static int printer = 0;
     public static PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 
     private static final double inch = 72;
@@ -25,7 +25,6 @@ public class PrintManager {
     }
 
     public static void executePrint(Printable printable, double paperHeight) {
-        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
         PrinterJob printerJob = PrinterJob.getPrinterJob();
 
         if (printServices.length > 0) {
@@ -46,6 +45,7 @@ public class PrintManager {
         paper.setImageableArea(0, 0, width, tempHeight);
         pageFormat.setPaper(paper);
         pageFormat.setOrientation(PageFormat.PORTRAIT);
+
         Book book = new Book();
         book.append(printable, pageFormat);
         printerJob.setPageable(book);
@@ -106,8 +106,8 @@ class ReceiptTemplate {
         g2D.setFont(g2D.getFont().deriveFont(Font.ITALIC));
         y += 2 * g2D.getFontMetrics().getHeight() - 10;
         g2D.drawString( "THANK YOU AND WE HOPE YOU HAVE A GREAT TIME!", centerX - g2D.getFontMetrics().stringWidth( "THANK YOU AND WE HOPE YOU HAVE A GREAT TIME!") / 2, y);
-
     }
+
     public static void receiptShop(Graphics2D g2D, ArrayList<Product> shoppingCart, ArrayList<Integer> quantities, ArrayList<Drinks.Size> sizes, double totalCost, double cash, double change) {
         int leftMargin = 20;
         int topMargin = 30;

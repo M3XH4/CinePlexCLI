@@ -6,17 +6,6 @@ public class CinemaManager {
     public CinemaManager() {
         setCinemas(new ArrayList<>());
     }
-    public void addCinema(Cinema cinema) {
-        cinemas.add(cinema);
-    }
-    public Cinema getCinema(String id) {
-        for (Cinema cinema : cinemas) {
-            if (cinema.getId().equals(id)) {
-                return cinema;
-            }
-        }
-        return null;
-    }
 
     public ArrayList<Cinema> getCinemas() {
         return cinemas;
@@ -24,6 +13,19 @@ public class CinemaManager {
 
     public void setCinemas(ArrayList<Cinema> cinemas) {
         this.cinemas = cinemas;
+    }
+
+    public void addCinema(Cinema cinema) {
+        cinemas.add(cinema);
+    }
+
+    public Cinema getCinema(String id) {
+        for (Cinema cinema : cinemas) {
+            if (cinema.getId().equals(id)) {
+                return cinema;
+            }
+        }
+        return null;
     }
 
     public Cinema findCinemaByMovieName(String movieName) {

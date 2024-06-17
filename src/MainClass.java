@@ -10,7 +10,7 @@ public class MainClass {
     public static ProductManager productManager = new ProductManager();
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        // Declaring Variables
+        // Initializing Objects
         Scanner input = new Scanner(System.in);
         Admin admin = new Admin();
 
@@ -29,7 +29,7 @@ public class MainClass {
 
         // Loading Cinema's Data From File And If It Is Empty Then Initialize CinemaManager If Not Then Load The Cinema
         // Manager With The Data From The File
-        ArrayList<Cinema> loadCinema = FileManager.loadBookings();
+        ArrayList<Cinema> loadCinema = FileManager.loadCinemas();
         // If File Is Empty Then Load The Cinema Manager With Default Values Else Then Put The Values On The File
         // To The File Manager
         if (loadCinema.isEmpty()) {
@@ -77,10 +77,13 @@ public class MainClass {
                     Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                     System.out.print(FontManager.TEXT_WHITE_BRIGHT + "Type Cinema Number or Movie Name To Select A Cinema or Type Back To Go Back To Main Page: ");
                     String cinemaChoice = input.nextLine();
+
                     if (cinemaChoice.equalsIgnoreCase("Back")) {
                         break;
                     }
+
                     Cinema selectedCinema = (cinemaManager.getCinema(cinemaChoice) != null) ? cinemaManager.getCinema(cinemaChoice) : cinemaManager.findCinemaByMovieName(cinemaChoice);
+
                     if (selectedCinema == null) {
                         System.out.println(FontManager.errorCombo + Global.putSpaces(36) + "ERROR! Could Not Find Cinema" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("ERROR! Could Not Find Cinema".length() + 36)));
                     } else {
@@ -89,6 +92,7 @@ public class MainClass {
                         System.out.println(FontManager.primaryCombo + Global.putSpaces(44) + "Cinema " + selectedCinema.getId() + " Is Selected" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("Cinema Is " + selectedCinema.getId() + " Selected").length() + 44)));
                         System.out.println(Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength));
                         System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "         Movie:     " + FontManager.BOLD + selectedCinema.getMovie().getName() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("         Movie:     " + selectedCinema.getMovie().getName()).length()));
+
                         int lineLength = horizontalLineLength - 28;
                         ArrayList<String> wrappedDetails = wrapText(selectedCinema.getMovie().getDetails(), lineLength);
                         System.out.println(FontManager.BACKGROUND_BLACK + FontManager.TEXT_WHITE_BRIGHT + "         Synopsis:  " + FontManager.BOLD + wrappedDetails.getFirst() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("         Synopsis:  " + wrappedDetails.getFirst()).length()));
@@ -121,7 +125,7 @@ public class MainClass {
                     Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
                     System.out.print(FontManager.responseCombo + "Type In The Name Of The Product To Purchase It or Type in Back To Go Back To Main Page");
                     if (loopRun > 0) {
-                        System.out.print(FontManager.responseCombo + " Or Type In Checkout\nTo Proceed To Purchase Items: " + FontManager.RESET);
+                        System.out.print(FontManager.responseCombo + " Or Type In Checkout\nTo Proceed To Purchase Products: " + FontManager.RESET);
                     } else {
                         System.out.print(": " + FontManager.RESET);
                     }
@@ -269,7 +273,7 @@ public class MainClass {
                                                         cinema.putSeats();
                                                         Thread.sleep(300);
                                                         System.out.println(FontManager.responseCombo + "Changed The Movie To " + cinema.getMovie().getName() + FontManager.RESET);
-                                                        FileManager.saveBookings(cinemaManager.getCinemas());
+                                                        FileManager.saveCinemas(cinemaManager.getCinemas());
                                                     } else {
                                                         System.out.println(FontManager.errorCombo + "    ERROR! Could Not Find " + movieName + " Movie, Please Input The Right Movie Name. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("    ERROR! Could Not Find " + movieName + " Movie, Please Input The Right Movie Name. Please Try Again.").length()));
                                                     }
@@ -504,6 +508,29 @@ public class MainClass {
     }
 
     //FUNCTIONS
+
+    //Function For Initializing Cinema
+    private static void initializeCinemas(CinemaManager cinemaManager) throws IOException {
+        cinemaManager.addCinema(new Cinema("1"));
+        cinemaManager.addCinema(new Cinema("2"));
+        cinemaManager.addCinema(new Cinema("3"));
+        cinemaManager.addCinema(new Cinema("4"));
+        cinemaManager.getCinema("1").setMovie(MovieAPI.fetchMovie("Avengers: Endgame"));
+        cinemaManager.getCinema("2").setMovie(MovieAPI.fetchMovie("Inside Out"));
+        cinemaManager.getCinema("3").setMovie(MovieAPI.fetchMovie("John Wick"));
+        cinemaManager.getCinema("4").setMovie(MovieAPI.fetchMovie("Saw X"));
+
+        FileManager.saveCinemas(cinemaManager.getCinemas());
+    }
+    //Function For Initializing Products
+    private static void initializeProducts(ProductManager productManager) throws IOException {
+        productManager.addProduct(new Snack("Popcorn", 45.00));
+        productManager.addProduct(new Snack("Fries", 35.00));
+        productManager.addProduct(new Drinks("Water", 15.00, 20.00, 25.00));
+        productManager.addProduct(new Drinks("Coke", 25.00, 35.00, 40.00));
+
+        FileManager.saveProducts(productManager.getProducts());
+    }
     private static int getQuantity(Product product) {
         Scanner input = new Scanner(System.in);
         int quantity;
@@ -526,7 +553,7 @@ public class MainClass {
     private static boolean handlePayment(boolean printReceipt, double total) {
         do {
             Scanner input = new Scanner(System.in);
-            System.out.print(FontManager.responseCombo + "Enter The Amount To Pay Or Type 'Cancel' To Cancel The Purchase: " + FontManager.RESET);
+            System.out.print(FontManager.responseCombo + "Enter Cash Received Or Type Cancel To Cancel The Purchase: " + FontManager.RESET);
             String payment = input.nextLine();
             if (payment.equalsIgnoreCase("Cancel")) {
                 Global.putHorizontalLine(FontManager.primaryCombo, horizontalLineLength);
@@ -546,7 +573,7 @@ public class MainClass {
                     System.out.println(FontManager.warningCombo + "WARNING! Insufficient Amount. Please Try Again." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Insufficient Amount. Please Try Again.".length()));
                 }
             } catch (NumberFormatException e) {
-                System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount Or Text." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount Or Text.".length()));
+                System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount. PLease Try Again" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - "WARNING! Invalid Input. Please Enter A Valid Amount. PLease Try Again".length()));
             }
         } while (true);
     }
@@ -618,25 +645,7 @@ public class MainClass {
         System.out.println(FontManager.primaryCombo + "|" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - 2) + FontManager.primaryCombo + "|" +FontManager.RESET);
         Global.putHorizontalLine(FontManager.secondaryCombo, horizontalLineLength);
     }
-    //Function For Initializing Cinema
-    private static void initializeCinemas(CinemaManager cinemaManager) throws IOException {
-        cinemaManager.addCinema(new Cinema("1"));
-        cinemaManager.addCinema(new Cinema("2"));
-        cinemaManager.addCinema(new Cinema("3"));
-        cinemaManager.addCinema(new Cinema("4"));
-        cinemaManager.getCinema("1").setMovie(MovieAPI.fetchMovie("Avengers: Endgame"));
-        cinemaManager.getCinema("2").setMovie(MovieAPI.fetchMovie("Inside Out"));
-        cinemaManager.getCinema("3").setMovie(MovieAPI.fetchMovie("John Wick"));
-        cinemaManager.getCinema("4").setMovie(MovieAPI.fetchMovie("Saw X"));
-    }
-    //Function For Initializing Products
-    private static void initializeProducts(ProductManager productManager) throws IOException {
-        productManager.addProduct(new Snack("Popcorn", 45.00));
-        productManager.addProduct(new Snack("Fries", 35.00));
-        productManager.addProduct(new Drinks("Water", 15.00, 20.00, 25.00));
-        productManager.addProduct(new Drinks("Coke", 25.00, 35.00, 40.00));
-        FileManager.saveProducts(productManager.getProducts());
-    }
+
     //Function For Wrapping Text
     private static ArrayList<String> wrapText(String text, int lineLength) {
         ArrayList<String> wrappedString = new ArrayList<>();

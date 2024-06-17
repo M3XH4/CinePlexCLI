@@ -3,9 +3,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Product implements Serializable {
+public class Product implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
     private String name;
     private double price;
 
@@ -43,12 +44,15 @@ class Snack extends Product implements Serializable {
 class Drinks extends Product implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
     public enum Size {
         SMALL,
         MEDIUM,
         LARGE
     }
+
     private Map<Size, Double> prices;
+
     public Drinks(String name, double smallPrice, double mediumPrice, double largePrice) {
         super(name, 0.0);
         setPrices(new HashMap<>());

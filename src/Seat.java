@@ -23,6 +23,7 @@ public class Seat {
         this.seatID = seatID;
     }
 
+
     public void book() {
         isAvailable = false;
     }

@@ -7,20 +7,13 @@ import org.json.JSONObject;
 
 
 public class Movie {
+
     private String name;
     private String details;
-    private String yearReleased;
+
     public Movie(String name, String details) {
         setName(name);
         setDetails(details);
-    }
-
-    public String getYearReleased() {
-        return yearReleased;
-    }
-
-    public void setYearReleased(String yearReleased) {
-        this.yearReleased = yearReleased;
     }
 
     public String getDetails() {
