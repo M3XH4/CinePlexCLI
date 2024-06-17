@@ -1,5 +1,7 @@
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Product implements Serializable {
     @Serial
@@ -45,41 +47,30 @@ class Drinks extends Product implements Serializable {
         SMALL,
         MEDIUM,
         LARGE;
+    }
+    private Map<Size, Double> prices;
+    public Drinks(String name, double smallPrice, double mediumPrice, double largePrice) {
+        super(name, 0.0);
+        setPrices(new HashMap<>());
+        getPrices().put(Size.SMALL, smallPrice);
+        getPrices().put(Size.MEDIUM, mediumPrice);
+        getPrices().put(Size.LARGE, largePrice);
+    }
 
-        private double price;  // Each size has a price.
+    public Map<Size, Double> getPrices() {
+        return prices;
+    }
 
-        public double getPrice() {
-            return this.price;
+    public void setPrices(Map<Size, Double> prices) {
+        this.prices = prices;
+    }
+
+    public Size getSize(double price) {
+        for (Drinks.Size size : Drinks.Size.values()) {
+            if (price == getPrices().get(size)) {
+                return size;
+            }
         }
-
-        public void setPrice(double price) {
-            this.price = price;
-        }
+        return null;
     }
-    private Size size;
-
-    public Drinks(String name, double price, Size size) {
-        super(name, price);
-        setSize(size);
-        setPriceForSize(size, price);
-    }
-    // Get the price for a specific size
-    public double getPriceForSize(Size size) {
-        return size.getPrice();
-    }
-
-    // Set the price for a specific size
-    public void setPriceForSize(Size size, double price) {
-        size.setPrice(price);
-    }
-
-    public Size getSize() {
-        return size;
-    }
-
-    public void setSize(Size size) {
-        this.size = size;
-    }
-
-
 }

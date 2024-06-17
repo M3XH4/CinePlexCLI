@@ -10,9 +10,15 @@ public class ProductManager implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private ArrayList<Product> products;
+    private ArrayList<Product> shoppingCart;
+    private ArrayList<Integer> quantities;
+    private ArrayList<Drinks.Size> sizes;
 
     public ProductManager() {
-        products = new ArrayList<>();
+        setProducts(new ArrayList<>());
+        setShoppingCart(new ArrayList<>());
+        setQuantities(new ArrayList<>());
+        setSizes(new ArrayList<>());
     }
     public ArrayList<Product> getProducts() {
         return products;
@@ -25,6 +31,31 @@ public class ProductManager implements Serializable {
     public void addProduct(Product product) {
         products.add(product);
     }
+
+    public ArrayList<Integer> getQuantities() {
+        return quantities;
+    }
+
+    public void setQuantities(ArrayList<Integer> quantities) {
+        this.quantities = quantities;
+    }
+
+    public ArrayList<Product> getShoppingCart() {
+        return shoppingCart;
+    }
+
+    public void setShoppingCart(ArrayList<Product> shoppingCart) {
+        this.shoppingCart = shoppingCart;
+    }
+
+    public ArrayList<Drinks.Size> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(ArrayList<Drinks.Size> sizes) {
+        this.sizes = sizes;
+    }
+
     public ArrayList<Product> findProductsByName(String name) {
         return (ArrayList<Product>) products.stream().filter(product -> product.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
     }
@@ -32,20 +63,20 @@ public class ProductManager implements Serializable {
         products.remove(product);
         FileManager.saveProducts(getProducts());
         if (product instanceof Drinks drinks) {
-            System.out.println(FontManager.primaryCombo + drinks.getName() + "- " + drinks.getSize() + " Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (drinks.getName() + "- " + drinks.getSize() + " Successfully Deleted...").length()));
+            System.out.println(FontManager.primaryCombo + drinks.getName() + "- " + drinks.getSize(drinks.getPrice()) + " Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (drinks.getName() + "- " + drinks.getSize(drinks.getPrice()) + " Successfully Deleted...").length()));
         } else {
             System.out.println(FontManager.primaryCombo + product.getName() + " Successfully Deleted..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (product.getName() + " Successfully Deleted...").length()));
         }
 
     }
 
-    public void updateProduct(Product product, String name, double price) {
-        String tempName = (name.isBlank()) ? product.getName() : name;
-        double tempPrice = (String.valueOf(price).isBlank()) ? product.getPrice() : price;
+    public void updateProduct(Product product, String newName, double oldPrice, double newPrice) {
+        String tempName = (newName.isBlank()) ? product.getName() : newName;
+        double tempPrice = (String.valueOf(newPrice).isBlank()) ? oldPrice : newPrice;
 
         product.setName(tempName);
         if (product instanceof Drinks drinks) {
-            drinks.setPriceForSize(drinks.getSize(), tempPrice);
+            drinks.getPrices().replace(drinks.getSize(oldPrice), tempPrice);
         } else {
             product.setPrice(tempPrice);
         }
@@ -74,7 +105,9 @@ public class ProductManager implements Serializable {
         Global.putHorizontalLine(FontManager.primaryCombo, MainClass.horizontalLineLength);
         for (Product product : products) {
             if (product instanceof Drinks drinks) {
-                System.out.println(FontManager.primaryCombo + "| " + Global.spacerString(57, drinks.getName()) + " | " + Global.spacerString(22, drinks.getSize().toString()) + " | " + Global.spacerString(23, (String.format("%.2f PHP", drinks.getPrice()))) + " |" + FontManager.RESET);
+                for (Drinks.Size size : Drinks.Size.values()) {
+                    System.out.println(FontManager.primaryCombo + "| " + Global.spacerString(57, drinks.getName()) + " | " + Global.spacerString(22, size.toString()) + " | " + Global.spacerString(23, String.format("%.2f PHP", drinks.getPrices().get(size))) + " |" + FontManager.RESET);
+                }
             }
         }
         Global.putHorizontalLine(FontManager.primaryCombo, MainClass.horizontalLineLength);
@@ -106,21 +139,5 @@ public class ProductManager implements Serializable {
             } while (true);
         }
         return null;
-    }
-    public void addDrink(String name, Drinks.Size size) throws IOException {
-        Scanner input =new Scanner(System.in);
-        do {
-            try {
-                System.out.print(FontManager.responseCombo + "What Is The Price Of " + size + " Size Of " + name + ": " + FontManager.RESET);
-                double price = input.nextDouble();
-                input.nextLine();
-                addProduct(new Drinks(name, price, size));
-                FileManager.saveProducts(getProducts());
-                break;
-            } catch (InputMismatchException e) {
-                System.out.println(FontManager.warningCombo + "WARNING! Invalid Input. Please Enter A Valid Amount.");
-                input.nextLine();
-            }
-        } while (true);
     }
 }
