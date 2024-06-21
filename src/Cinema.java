@@ -39,11 +39,12 @@ public class Cinema {
 
     public void putSeats() {
         String[] rows = {"G", "F", "E", "D", "C", "B", "A"};
-        for(String row : rows) {
+        for(String row : rows) { //G
             for (int i = 1; i <= 6; i++) {
                 seats.add(new Seat(row + i));
             }
         }
+        // String row = "G"
     }
 
     public int totalBookedSeats() {
@@ -71,7 +72,7 @@ public class Cinema {
             if (seat.getSeatID().equals(seatID) && seat.isAvailable()) {
                 seat.book();
                 FileManager.saveCinemas(cinemaManager.getCinemas());
-                Thread.sleep(300);
+                Thread.sleep(200);
                 System.out.println(FontManager.primaryCombo + Global.putSpaces(42) + "Successfully Booked Seat " + seat.getSeatID() + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, MainClass.horizontalLineLength - (("Successfully Booked Seat " + seat.getSeatID()).length() + 42)));
             }
         }
@@ -82,7 +83,7 @@ public class Cinema {
             if (seat.getSeatID().equals(seatID) && !(seat.isAvailable())) {
                 seat.cancel();
                 FileManager.saveCinemas(cinemaManager.getCinemas());
-                Thread.sleep(300);
+                Thread.sleep(200);
                 System.out.println(FontManager.primaryCombo + "Successfully Cancelled The Booking of Seat " + seat.getSeatID() + "." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK,  MainClass.horizontalLineLength - ("Successfully Cancelled The Booking of Seat " + seat.getSeatID() + "." ).length()));
             }
         }

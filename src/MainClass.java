@@ -220,7 +220,8 @@ public class MainClass {
                             do {
                                 try {
                                     displayCinemas(cinemaManager);
-                                    System.out.print(FontManager.secondaryCombo + "Type In Cinema Number (1/2/3/4):" + FontManager.RESET + "  ");
+                                    Global.putHorizontalLine(FontManager.tertiaryCombo, horizontalLineLength);
+                                    System.out.print(FontManager.responseCombo + "Type In Cinema Number (1/2/3/4): " + FontManager.RESET);
                                     String cinemaID = input.nextLine();
                                     Cinema cinema = cinemaManager.getCinema(cinemaID);
                                     do {
@@ -242,7 +243,7 @@ public class MainClass {
                                         if (cinemaChoice.equals("CANCEL")) {
                                             do {
                                                 printDisplaySeats(cinema);
-                                                System.out.print(FontManager.secondaryCombo + "Type In Seat Number To Cancel Booking Or Type In Back To Go Back To Admin Page:" + FontManager.RESET + "  ");
+                                                System.out.print(FontManager.secondaryCombo + "Type In Seat Number To Cancel Booking Or Type In Back To Go Back To Selections:" + FontManager.RESET + " ");
                                                 String cancelChoice = input.nextLine();
                                                 if (cancelChoice.equalsIgnoreCase("Back")) {
                                                     break;
@@ -271,7 +272,7 @@ public class MainClass {
                                                         cinema.setMovie(movie);
                                                         cinema.setSeats(new ArrayList<>());
                                                         cinema.putSeats();
-                                                        Thread.sleep(300);
+                                                        Thread.sleep(200);
                                                         System.out.println(FontManager.responseCombo + "Changed The Movie To " + cinema.getMovie().getName() + FontManager.RESET);
                                                         FileManager.saveCinemas(cinemaManager.getCinemas());
                                                     } else {
@@ -283,13 +284,13 @@ public class MainClass {
                                                 }
                                             } while (true);
                                         } else if (cinemaChoice.equals("BACK")) {
-                                            adminEditCRunning = false;
+                                        	adminEditCRunning = false;
                                             break;
                                         }
                                     } while (true);
 
                                 } catch (NullPointerException e) {
-                                    System.out.println(FontManager.errorCombo + Global.putSpaces(36) + "Cinema Not Found. Please Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Cinema Not Found. Please Try Again...".length() + 36)));
+                                    System.out.println(FontManager.errorCombo + Global.putSpaces(36) + "ERROR! Cinema Not Found. Please Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Cinema Not Found. Please Try Again...".length() + 36)));
                                     input.reset();
                                 }
                             } while (adminEditCRunning);
@@ -499,7 +500,7 @@ public class MainClass {
                     } while (adminPageRunning);
                 } else {
                     System.out.println(FontManager.errorCombo + Global.putSpaces(37) + "Incorrect Username Or Password" + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("Incorrect Username Or Password".length() + 37)));
-                    Thread.sleep(300);
+                    Thread.sleep(200);
                 }
             } else if (choice.equals("EXIT")) {
                 break;
@@ -584,12 +585,11 @@ public class MainClass {
                 if (seat.isAvailable()) {
                     if (handlePayment(false,250.00)) {
                         cinema.bookSeat(cinemaManager, seatNumber);
-                        Thread.sleep(300);
                         PrintManager.print(cinema.getMovie().getName(), cinema.getId(), seat.getSeatID());
                     }
                 } else {
                     System.out.println(FontManager.errorCombo + Global.putSpaces(20) + "I'm Sorry But The Seat " + seat.getSeatID() + " Is Currently Booked. Please Pick Another Seat. " + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - (("I'm Sorry But The Seat " + seat.getSeatID() + " Is Currently Booked. Please Pick Another Seat. " ).length() + 20)));
-                    Thread.sleep(300);
+                    Thread.sleep(200);
                 }
             } else if (reservation.equals("CANCEL")) {
                 if (!seat.isAvailable()) {
@@ -605,7 +605,7 @@ public class MainClass {
             }
         } else {
             System.out.println(FontManager.warningCombo + Global.putSpaces(25) + "WARNING! Please Input The Right Seat Number. PLease Try Again..." + Global.putBackgroundColor(FontManager.BACKGROUND_BLACK, horizontalLineLength - ("WARNING! Please Input The Right Seat Number. PLease Try Again...".length() + 25)));
-            Thread.sleep(300);
+            Thread.sleep(200);
         }
     }
     private static boolean handleWarning(String warning) {
